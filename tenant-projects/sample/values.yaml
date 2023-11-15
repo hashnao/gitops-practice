@@ -11,3 +11,9 @@ namespaces:
       users:
         - apple
         - banana
+    resourceQuotas:
+      # Enable Quotas or not. You can either disable it or remove the whole block
+      enabled: false
+    limitRanges:
+      # Enable Quotas or not. You can either disable it or remove the whole block
+      enabled: false
