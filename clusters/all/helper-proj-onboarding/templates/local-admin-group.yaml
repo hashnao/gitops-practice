@@ -7,6 +7,7 @@ kind: Group
 apiVersion: user.openshift.io/v1
 metadata:
   name: {{ if .local_admin_group.group_name }}{{ .local_admin_group.group_name }}{{- else }}{{ .name | replace "_" "-" }}-admins{{- end }}
+   argocd.argoproj.io/sync-wave: "0"
 users:
   {{- range .local_admin_group.users }}
   - {{ . }}
