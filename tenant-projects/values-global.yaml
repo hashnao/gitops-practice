@@ -1,0 +1,39 @@
+---
+
+global:
+  # Namespace of application scoped GitOps instance, that is responsible to deploy workload onto the clusters
+  application_gitops_namespace: gitops-application
+  tshirt_sizes:
+    - name: XL
+      quota:
+        pods: 100
+        limits:
+          cpu: 4
+          memory: 4Gi
+        requests:
+          cpu: 1
+          memory: 2Gi     
+    - name: L
+      quota:
+        limits:
+          cpu: 2
+          memory: 2Gi
+        requests:
+          cpu: 1
+          memory: 1Gi 
+    - name: S
+      quota:
+        limits:
+          cpu: 1
+          memory: 1Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+      limitRanges:
+        container:
+          default:
+            cpu: 1
+            memory: 4Gi
+          defaultRequest:
+            cpu: 1
+            memory: 2Gi
