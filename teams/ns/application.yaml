@@ -11,7 +11,7 @@ spec:
       value: Create namespace via Application
   project: default
   source:
-    path: teams/team-a
+    path: teams/ns/teams
     repoURL: 'https://github.com/hashnao/gitops-practice.git'
     targetRevision: main
   syncPolicy:
