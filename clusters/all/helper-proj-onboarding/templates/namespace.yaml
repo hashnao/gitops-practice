@@ -7,7 +7,7 @@ metadata:
   name: {{ .name | replace "_" "-" | quote }}
   labels:
     argocd.argoproj.io/managed-by: {{ $.Values.global.application_gitops_namespace }}
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "0"
     {{- include "common.labels" $ | nindent 4 }}
     {{- if .labels -}}
     {{ toYaml .labels | nindent 4 }}
