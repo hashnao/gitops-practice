@@ -1,0 +1,13 @@
+namespaces:
+  # Name of the first Namespace
+  - name: &name sample-project-1
+    # Is this Namespace enabled or not
+    enabled: true
+    # Create a local Group with Admin users and the required rolebinding
+    # If other systems, like LDAP Group sync is used, you will probaably not need this and can either disable it or remove the whole block.
+    local_admin_group:
+      enabled: true
+      group_name: sample-teams
+      users:
+        - apple
+        - banana
