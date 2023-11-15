@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ns
+  namespace: openshift-gitops
+spec:
+  destination:
+    server: 'https://kubernetes.default.svc'
+  info:
+    - name: Description
+      value: Create namespace via Application
+  project: default
+  source:
+    path: teams/team-a
+    repoURL: 'https://github.com/hashnao/gitops-practice.git'
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
