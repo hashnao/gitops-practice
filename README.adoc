@@ -6,13 +6,14 @@
 GitOps Operator を用いて以下のタスクを実施します、Helm Charts を利用します。
 
 * <<Camel K Operator>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
-  - Camel K Operator を指定の Namespace にインストールする
+  - Camel K Operator を指定の Namespace (camelk-test00) にインストールする
   - Nexus の認証情報を定義する ConfigMap を作成する
+  - IntegrationPlatform CR を作成する
 * <<Namespace & Group>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
-  - 複数の Namespace を作成する
-  - グループを作成する
-  - グループにユーザを追加する
-  - グループに作成した Namespace に対する admin 権限を付与する
+  - 複数の Namespace (camelk-test0{0,1}) を作成する
+  - グループ (sample-teams) を作成する
+  - グループ (sample-teams) にユーザ (apple, banana) を追加する
+  - グループ (sample-teams) に Namespace (camelk-test0{0,1}) に対する admin 権限を付与する
 
 == Prerequisites
 
@@ -44,7 +45,7 @@ vim tenant-projects/namespace/${BRANCH}/values.yaml
 NOTE: 設定例は以下のサンプルを参照下さい。
 その他の変数など詳細は https://github.com/tjungbauer/helm-charts/tree/main/charts/helper-operator を参照下さい。
 +
-.tenant-projects/namespace/sample/values.yaml
+.https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/namespace/sample/values.yaml[tenant-projects/namespace/sample/values.yaml]
 ----
 include::tenant-projects/namespace/sample/values.yaml[]
 ----
@@ -101,6 +102,7 @@ vim tenant-projects/camelk/${BRANCH}/values.yaml
 NOTE: 設定例は以下のサンプルを参照下さい。
 +
 .tenant-projects/camelk/sample/values.yaml
+.https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/camelk/sample/values.yaml[tenant-projects/camelk/sample/values.yaml]
 ----
 include::tenant-projects/camelk/sample/values.yaml[]
 ----
