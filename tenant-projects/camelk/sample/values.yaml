@@ -1,5 +1,4 @@
 operators:
-  syncwave: 2
   camelk-operator:
     enabled: true
     namespace:
