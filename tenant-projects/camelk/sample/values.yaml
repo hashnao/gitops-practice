@@ -16,3 +16,6 @@ operators:
     nexus:
       username: nexus
       password: nexus
+    waitforcheck:
+      crd: integrationplatforms.camel.apache.org
+      create: true
