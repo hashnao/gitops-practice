@@ -2,7 +2,7 @@ operators:
   camelk-operator:
     enabled: true
     namespace:
-      name: camelk-test03
+      name: camelk-test04
       create: true
     subscription:
       channel: 1.10.x
@@ -16,6 +16,3 @@ operators:
     nexus:
       username: nexus
       password: nexus
-    waitforcheck:
-      crd: integrationplatforms.camel.apache.org
-      create: true
