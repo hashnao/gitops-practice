@@ -49,7 +49,7 @@ data:
         <server>
           <id>nexus</id>
           <username>{{ $value.nexus.username }}</username>
-          <passworde>{{ $value.nexus.password }}</passworde>
+          <passworde>{{ $value.nexus.password }}</password>
         </server>
         <server>
           <id>mirror</id>
