@@ -1,0 +1,15 @@
+operators:
+  camelk-operator:
+    enabled: true
+    namespace:
+      name: camelk-test01
+      create: true
+    subscription:
+      channel: 1.10.x
+      approval: Manual
+      operatorName: red-hat-camel-k
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    operatorgroup:
+      create: true
+      notownnamespace: false
