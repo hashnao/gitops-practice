@@ -3,7 +3,7 @@ operators:
     enabled: true
     namespace:
       name: camelk-test00
-      create: true
+      create: false
     subscription:
       channel: 1.10.x
       approval: Automatic
