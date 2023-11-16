@@ -6,7 +6,7 @@ operators:
       create: true
     subscription:
       channel: 1.10.x
-      approval: Manual
+      approval: Automatic
       operatorName: red-hat-camel-k
       source: redhat-operators
       sourceNamespace: openshift-marketplace
