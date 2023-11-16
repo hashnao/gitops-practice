@@ -1,0 +1,22 @@
+{{- range $key, $value := .Values.operators }}
+{{- if eq ($value.enabled | toString) "true" }}
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openshift-gitops-openshift-gitops-argocd-application-controller
+  namespace: {{ $value.namespace.name | quote }}
+  labels:
+    {{- include "common.labels" $ | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "1" | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: {{ $.Values.global.application_gitops_namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openshift-gitops-openshift-gitops-argocd-application-controller
+{{- end }}
+{{- end }}

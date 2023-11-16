@@ -19,10 +19,7 @@ spec:
   - name: crd-check 
     image: quay.io/openshift/origin-cli:latest
     imagePullPolicy: IfNotPresent
-    command: ['sh', '-c', 'while [ true ]; do oc get crd 
-  {{ $value.waitforcheck.crd }}
-
-    ; if [ $? -eq 0 ]; then break; fi ; sleep 5s; done']
+    command: ['sh', '-c', 'while [ true ]; do oc get crd {{ $value.waitforcheck.crd }} ; if [ $? -eq 0 ]; then break; fi ; sleep 5s; done']
   restartPolicy: Never
   terminationGracePeriodSeconds: 0
   serviceAccount: default
