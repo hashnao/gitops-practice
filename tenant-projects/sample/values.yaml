@@ -12,7 +12,8 @@ namespaces:
         - apple
         - banana
 operators:
-  - camelk:
+  syncwave: 2
+  camelk:
     enabled: true
     namespace:
       name: test01
