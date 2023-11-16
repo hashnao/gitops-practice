@@ -11,3 +11,19 @@ namespaces:
       users:
         - apple
         - banana
+operators:
+  syncwave: 2
+  camelk:
+    enabled: true
+    namespace:
+      name: test01
+      create: false
+    subscription:
+      channel: 1.10.x
+      approval: Manual
+      operatorName: red-hat-camel-k
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    operatorgroup:
+      create: true
+      notownnamespace: false
