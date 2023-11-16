@@ -1,7 +1,7 @@
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
 ---
-apiVersion: operators.coreos.com/v1alpha1
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: maven-settings
