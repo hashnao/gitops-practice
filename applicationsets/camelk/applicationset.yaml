@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: onboarding-tenant-workload
+  name: camelk
   namespace: openshift-gitops
 spec:
   goTemplate: true
@@ -15,7 +15,7 @@ spec:
         revision: main
   template:
     metadata:
-      name: "{{ index .path.segments 1 | normalize }}-{{ .path.basename }}"
+      name: "{{ index .path.segments 1 | normalize }}-{{ .path.basename }}-01"
     spec:
       info:
         - name: Description
