@@ -1,7 +1,5 @@
-{{- range $key, $value := .Values.operators }}
-{{ if eq ($value.enabled | toString) "true" }}
-{{ if eq ($value.waitforcheck.create | toString) "true" }}
----
+{{- if .Values.waitforcheck }}
+
 apiVersion: v1
 kind: Pod
 metadata:
@@ -24,6 +22,4 @@ spec:
   terminationGracePeriodSeconds: 0
   serviceAccount: default
   serviceAccountName: default
-{{- end }}
-{{- end }}
 {{- end }}
