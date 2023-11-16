@@ -1,0 +1,63 @@
+{{- range $key, $value := .Values.operators }}
+{{- if eq ($value.enabled | toString) "true" }}
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: ConfigMap
+metadata:
+  name: maven-settings
+  namespace: {{ $value.namespace.name | quote }}
+  labels:
+    {{- include "common.labels" $ | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "1" | quote }}
+data:
+  settings.xml: |
+    <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+      <mirrors>
+        <mirror>
+          <id>mirror</id>
+          <name>Mirror</name>
+          <url>http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/</url>
+          <mirrorOf>*</mirrorOf>
+        </mirror>
+      </mirrors>
+      <profiles>
+        <profile>
+          <id>nexus</id>
+          <activation>
+            <activeByDefault>true</activeByDefault>
+          </activation>
+          <repositories>
+            <repository>
+              <id>nexus</id>
+              <url>http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/</url>
+              <releases>
+                <enabled>true</enabled>
+              </releases>
+              <snapshots>
+                <enabled>true</enabled>
+              </snapshots>
+            </repository>
+          </repositories>
+        </profile>
+      </profiles>
+      <servers>
+        <server>
+          <id>nexus</id>
+          <username>{{ $value.nexus.username }}</username>
+          <passworde>{{ $value.nexus.passworde }}</passworde>
+        </server>
+        <server>
+          <id>mirror</id>
+          <username><NEXUS_USERNAME></username>
+          <password><NEXUS_PASSWORD></password>
+        </server>
+      </servers>
+    </settings>
+
+{{- end }}
+{{- end }}
