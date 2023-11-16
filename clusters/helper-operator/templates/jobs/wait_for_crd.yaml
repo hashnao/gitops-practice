@@ -2,6 +2,7 @@
 {{ if eq ($value.enabled | toString) "true" }}
 {{ if eq ($value.waitforcheck.create | toString) "true" }}
 ---
+apiVersion: v1
 kind: Pod
 metadata:
   name: cluster-check 
