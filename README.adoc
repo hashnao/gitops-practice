@@ -5,24 +5,27 @@
 
 GitOps Operator を用いて以下のタスクを実施します、Helm Charts を利用します。
 
-* <<Camel K Operator>> は 以下のタスクを実施します。
-  - Namespace を作成する
+* <<Camel K Operator>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
   - Camel K Operator を指定の Namespace にインストールする
   - Nexus の認証情報を定義する ConfigMap を作成する
+* <<Namespace & Group>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
+  - 複数の Namespace を作成する
+  - グループを作成する
+  - グループにユーザを追加する
+  - グループに作成した Namespace に対する admin 権限を付与する
 
 == Prerequisites
 
 * 製品ガイドに従い https://docs.openshift.com/gitops/1.10/installing_gitops/installing-openshift-gitops.html[OpenShift Pipelines Operator] をインストールする
 
-== Camel K Operator
-
-. Git Repository をクローンする
-+
+* Git Repository をクローンする
 ----
 export URL=https://github.com/hashnao/gitops-practice
 git clone ${URL}
 cd gitops-samples
 ----
+
+== Namespace & Group
 
 . Branch を作成する
 +
@@ -35,14 +38,14 @@ git checkout ${BRANCH}
 . サンプルから `values.yaml` を作成し必要な値を定義する
 +
 ----
-cp -r tenant-projects/camelk/sample tenant-projects/camelk/${BRANCH}
-vim tenant-projects/camelk/${BRANCH}
+cp -r tenant-projects/namespace/sample tenant-projects/namespace/${BRANCH}
+vim tenant-projects/namespace/${BRANCH}/values.yaml
 ----
 NOTE: 設定例は以下のサンプルを参照下さい。
 +
-.tenant-projects/camelk/sample/values.yaml
+.tenant-projects/namespace/sample/values.yaml
 ----
-include::../tenant-projects/camelk/sample/values.yaml[]
+include::tenant-projects/namespace/sample/values.yaml[]
 ----
 
 . 変更をコミットし、Remote にプッシュする
@@ -53,26 +56,12 @@ git commit tenant-projects/${BRANCH}
 git push -u origin ${BRANCH}
 ----
 
-. GitHub で PR を作成し、マージする
+. GitHub (https://github.com) で PR を作成し、マージする
 +
-
 NOTE: エラーなどでマージした設定を修正する場合はローカルで変更をコミットし、Remote にプッシュした後、GitHub で PR をマージします。
 ArgoCD は Git Repository (GitHub) にデフォルトで 3 分毎にポーリングし変更の有無をチェックします。
 これは Argo CD の環境変数 https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/#automated-sync-semantics[ARGOCD_RECONCILIATION_TIMEOUT] に基づきます。
-ROSA (OCP) も同様です、詳細は https://access.redhat.com/solutions/7012592[Configure applications sync frequency on GitOps / ArgoCD on RHOCP4} を参照下さい。
-
-. ApplicationSet CR を作成する
-+
-----
-oc apply -f ./applicationsets/camelk/applicationset.yaml
-----
-
-. ApplicationSet CR から Application CR が作成されることを確認する
-+
-----
-oc apply -f ./applicationsets/camelk/applicationset.yaml
-----
-NOTE: ここでは PR をマージした後に ApplicationSet CR を作成していますが、事前に作成しても問題ありません。
+ROSA (OCP) も同様です、詳細は https://access.redhat.com/solutions/7012592[Configure applications sync frequency on GitOps / ArgoCD on RHOCP4] を参照下さい。
 
 . Argo CD Web Console の URL を取得し WEB ブラウザからリンクを開く
 +
@@ -88,11 +77,56 @@ NOTE: OpenShift Web Console から Argo CD Web Console を開くこともでき�
 +
 image::rosa_console.png[]
 
-. アプリケーション (Application CR) の進捗を確認する
+. Argo CD Web Console からアプリケーション (Application CR) の進捗を確認する
 +
-NOTE: Operator のインストールに数分かかるため、進捗を確認します。以下は正常に完了した際の画像です
-Application CR のステータスは OpenShift CLI からも確認することができます。
-作成される API リソースの相関は表示されないため、進捗を確認するには Web Console の方が便利です。
+image::app_namespace_completed.png[]
+
+== Camel K Operator
+
+. Branch を作成する
++
+----
+export BRANCH=my-team
+git branch ${BRANCH}
+git checkout ${BRANCH}
+----
+
+. サンプルから `values.yaml` を作成し必要な値を定義する
++
+----
+cp -r tenant-projects/camelk/sample tenant-projects/camelk/${BRANCH}
+vim tenant-projects/camelk/${BRANCH}/values.yaml
+----
+NOTE: 設定例は以下のサンプルを参照下さい。
++
+.tenant-projects/camelk/sample/values.yaml
+----
+include::tenant-projects/camelk/sample/values.yaml[]
+----
+
+. 変更をコミットし、Remote にプッシュする
++
+----
+git add tenant-projects/${BRANCH}
+git commit tenant-projects/${BRANCH}
+git push -u origin ${BRANCH}
+----
+
+. GitHub で PR を作成し、マージする
++
+
+. ApplicationSet CR を作成する
++
+----
+oc apply -f ./applicationsets/camelk/applicationset.yaml
+----
+NOTE: ApplicationSet CR を作成すると Application CR が作成され、Helm Charts が開始されます。
+
+. Argo CD Web Console からアプリケーション (Application CR) の進捗を確認する
++
+NOTE: Operator のインストールに要する時間は Namespace の作成するケースとは異なり数分かかるため、全体の相関や進捗を確認するには Web Console の方が便利です。
+Application CR のステータスは <<Troubleshooting>> の手順で示している様に OpenShift CLI (oc get/describe app) からも確認することができますが、作成される API リソースの相関は表示されません。
+以下は正常に完了した際の画像です。
 +
 image::app_camelk_completed.png[]
 
@@ -135,3 +169,91 @@ Status:
     Message:               Failed sync attempt to e8ec3aa6e4282a14ce242d15e0564078d3c96065: one or more objects failed to apply, reason: integrationplatforms.camel.apache.org "camel-k" is forbidden: User "system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller" cannot patch resource "integrationplatforms" in API group "camel.apache.org" in the namespace "camelk-test02"
     Type:                  SyncError
 ----
+
+== Appendix
+
+=== ApplicationSet
+
+以下は <<Namespace & Group>> のセクションで利用する ApplicationSet CR (applicationsets/namespace/applicationset.yaml) に定義するフィールドを解説します。
+<<Camel K Operator>> で利用する ApplicationSet の構造も同じです。
+設定を変更する際に参考にして下さい。
+
+(1) ApplicationSet CR を削除すると Application CR が作成した Namespace などの API リソースが削除されます。
+https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Controlling-Resource-Modification/#prevent-an-applications-child-resources-from-being-deleted-when-the-parent-application-is-deleted[preserveResourcesOnDeletion] を `true` に設定することで API リソースを残します。
+
+(2) Namespace やグループ名など環境毎に変数を定義する values.yaml のパスを示します。
+https://argocd-applicationset.readthedocs.io/en/stable/Generators-Git/[Git Generator] を利用することで `tenant-projects/namespace/my-team/values.yaml` の様に新たにディレクトリとファイルを追加して PR をマージすることで Application CR に設定を追加する必要なく values.yaml に定義した設定をもとに Namespace やグループを新たに生成します。
+
+(3) ApplicationSet CR を作成すると ApplicationSet CR が自動で Application CR を生成します。
+自動で生成される Application CR 名は `tenant-projects/camelk/sample` のディレクトリ名から生成しています。
+
+(4) 設定を適用する ROSA Cluster のエンドポイントを示します。
+GitOps Operator を ROSA (OCP) Cluster 上にデプロイしているため、https://...:6443/ の様な FQDN でなく Service 名を指定しています。
+
+(5) Argo CD の Application をデプロイする Argo CD 上のプロジェクトを指定します。
+Application CR を作成する OpenShift のプロジェクト (Namespace) ではありません。
+
+(6) Helm Chart などを含む Git Repository の URL を指定します。 Cf. https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Template/#template-fields[Template fields]
+
+(7) ターゲットとする Git Repository のブランチを指定します。
+この例では Argo CD は main ブランチにマージした設定を対象とします。
+
+(8) ターゲットとする Git Repository のディレクトリを指定します。
+path に指定したディレクトリだけを対象とし、再帰的に配下のディレクトリは参照しません。Cf. https://argo-cd.readthedocs.io/en/stable/user-guide/directory/#enabling-recursive-resource-detection[Enabling Recursive Resource Detection]
+
+(9) files で指定したパスの values.yaml をインクルードします。
+
+(10) グローバルに設定する values.yaml のパスを示します。
+例えば GitOps Operator をインストールする openshift-gitops Namespace を定義します。
+
+(11) automated を指定することで自動で Git Repository から同期します。指定しない場合は Argo CD Console から手動で Sync する必要があります。
+Cf. https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/[Automated Sync Policy]
+
+(12) automated を定義するとデフォルトで Argo CD は Git Repository から削除された設定を検出するとリソースを削除しません。(prune: false)
+`prune: true` を指定するとリソースを削除します。Cf. https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/#automatic-pruning[Automatic Pruning]
+
+(13) デフォルトでクラスタに適用した変更は automated sync を実行しません。
+`selfHeal: true` は Argo CD はデプロイされたアプリケーションの状態を常に監視し Git Repository のマニフェストとクラスタのライブの変更の違いを検出し、自動で修正します。
+Cf. https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/#automatic-self-healing[Automatic Self-Healing]
+
+.applicationsets/namespace/applicationset.yaml
+----
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: onboarding
+  namespace: openshift-gitops
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: true (1)
+  generators:
+    - git:
+        files: (2)
+          - path: tenant-projects/namespace/**/values.yaml
+        repoURL: "https://github.com/hashnao/gitops-practice"
+        revision: main
+  template:
+    metadata:
+      name: "{{ index .path.segments 1 | normalize }}-{{ .path.basename }}" (3)
+    spec:
+      info:
+        - name: Description
+          value: Create namespaces and add users to the group
+      destination: (4)
+        server: "https://kubernetes.default.svc"
+      project: default (5)
+      source:
+        repoURL: "https://github.com/hashnao/gitops-practice" (6)
+        targetRevision: main (7)
+        path: clusters/helper-proj-onboarding (8)
+        helm:
+          valueFiles:
+            - "/{{ .path.path }}/values.yaml" (9)
+            - /tenant-projects/values-global.yaml (10)
+      syncPolicy:
+        automated: (11)
+          prune: false (12)
+          selfHeal: true (13)
+----
+
