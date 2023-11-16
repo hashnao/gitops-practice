@@ -13,6 +13,6 @@ operators:
     operatorgroup:
       create: true
       notownnamespace: false
-nexus:
-  username: nexus
-  password: nexus
+    nexus:
+      username: nexus
+      password: nexus
