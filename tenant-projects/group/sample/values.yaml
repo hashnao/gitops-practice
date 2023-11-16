@@ -1,0 +1,16 @@
+namespaces:
+  # 1st Namespace
+  - name: &name camelk-test00
+    # Is this Namespace enabled or not
+    enabled: true
+    # Create a local Group with Admin users and the required rolebinding
+    local_admin_group:
+      enabled: true
+      group_name: sample-teams
+      users:
+        - apple
+        - banana
+  #  2nd Namespace
+  - name: camelk-test01
+    # shall namespace be created of not
+    enabled: true
