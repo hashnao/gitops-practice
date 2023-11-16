@@ -1,6 +1,6 @@
 namespaces:
   # Name of the first Namespace
-  - name: &name sample-project-1
+  - name: &name test01
     # Is this Namespace enabled or not
     enabled: true
     # Create a local Group with Admin users and the required rolebinding
@@ -11,9 +11,3 @@ namespaces:
       users:
         - apple
         - banana
-    resourceQuotas:
-      # Enable Quotas or not. You can either disable it or remove the whole block
-      enabled: false
-    limitRanges:
-      # Enable Quotas or not. You can either disable it or remove the whole block
-      enabled: false
