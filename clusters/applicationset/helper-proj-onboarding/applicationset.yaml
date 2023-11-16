@@ -28,7 +28,7 @@ spec:
           valueFiles:
             - "/{{ .path.path }}/values.yaml"
             - /tenant-projects/values-global.yaml
-        path: clusters/all/helper-proj-onboarding
+        path: clusters/helper-proj-onboarding
         repoURL: "https://github.com/hashnao/gitops-practice"
         targetRevision: main
       syncPolicy:
