@@ -21,7 +21,7 @@ data:
         <mirror>
           <id>mirror</id>
           <name>Mirror</name>
-          <url>http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/</url>
+          <url>{{ $value.nexus.mirror_url }}</url>
           <mirrorOf>*</mirrorOf>
         </mirror>
       </mirrors>
@@ -34,7 +34,7 @@ data:
           <repositories>
             <repository>
               <id>nexus</id>
-              <url>http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/</url>
+              <url>{{ $value.nexus.mirror_url }}</url>
               <releases>
                 <enabled>true</enabled>
               </releases>

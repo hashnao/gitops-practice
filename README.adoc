@@ -42,6 +42,7 @@ cp -r tenant-projects/namespace/sample tenant-projects/namespace/${BRANCH}
 vim tenant-projects/namespace/${BRANCH}/values.yaml
 ----
 NOTE: 設定例は以下のサンプルを参照下さい。
+その他の変数など詳細は https://github.com/tjungbauer/helm-charts/tree/main/charts/helper-operator を参照下さい。
 +
 .tenant-projects/namespace/sample/values.yaml
 ----
