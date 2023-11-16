@@ -1,0 +1,186 @@
+:toc: auto
+:imagesdir: ../images
+
+= Onboarding
+
+GitOps Operator を用いて以下のタスクを実施します、Helm Charts を利用します。
+
+* <<Camel K Operator>> は 以下のタスクを実施します。
+  - Namespace を作成する
+  - Camel K Operator を指定の Namespace にインストールする
+  - Nexus の認証情報を定義する ConfigMap を作成する
+
+== Prerequisites
+
+* 製品ガイドに従い https://docs.openshift.com/gitops/1.10/installing_gitops/installing-openshift-gitops.html[OpenShift Pipelines Operator] をインストールする
+
+== Camel K Operator
+
+. Git Repository を自身のする
++
+----
+export URL=https://github.com/hashnao/gitops-practice
+git clone ${URL}
+cd gitops-samples
+----
+
+. Branch を作成する
++
+----
+export BRANCH=my-team
+git branch ${BRANCH}
+git checkout ${BRANCH}
+----
+
+. サンプルから `values.yaml` を作成し必要な値を定義する
++
+----
+cp -r tenant-projects/camelk/sample tenant-projects/camelk/${BRANCH}
+vim tenant-projects/camelk/${BRANCH}
+----
+NOTE: 設定例は以下のサンプルを参照下さい。
++
+.tenant-projects/camelk/sample/values.yaml
+----
+include::../tenant-projects/camelk/sample/values.yaml[]
+----
+
+. 変更をコミットし、Remote にプッシュする
++
+----
+git add tenant-projects/${BRANCH}
+git commit tenant-projects/${BRANCH}
+git push -u origin ${BRANCH}
+----
+
+. GitHub で PR を作成し、マージする
++
+
+NOTE: エラーなどでマージした設定を修正する場合はローカルで変更をコミットし、Remote にプッシュした後、GitHub で PR をマージします。
+ArgoCD は Git Repository (GitHub) にデフォルトで 3 分毎にポーリングし変更の有無をチェックします。
+これは Argo CD の環境変数 https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/#automated-sync-semantics[ARGOCD_RECONCILIATION_TIMEOUT] に基づきます。
+ROSA (OCP) も同様です、詳細は https://access.redhat.com/solutions/7012592[Configure applications sync frequency on GitOps / ArgoCD on RHOCP4} を参照下さい。
+
+. ApplicationSet CR を作成する
++
+----
+oc apply -f ./applicationsets/camelk/applicationset.yaml
+----
+
+. ApplicationSet CR から Application CR が作成されることを確認する
++
+----
+oc apply -f ./applicationsets/camelk/applicationset.yaml
+----
+NOTE: ここでは PR をマージした後に ApplicationSet CR を作成していますが、事前に作成しても問題ありません。
+
+. Argo CD Web Console の URL を取得し WEB ブラウザからリンクを開く
++
+----
+oc -n openshift-gitops get route openshift-gitops-server -ojsonpath='{.spec.host}{"\n"}'
+----
+.Example Output
++
+----
+openshift-gitops-server-openshift-gitops.apps.rosa-lfqzn.thtb.p1.openshiftapps.com
+----
+NOTE: OpenShift Web Console から Argo CD Web Console を開くこともできます。
++
+image::rosa_console.png[]
+
+. アプリケーション (Application CR) の進捗を確認する
++
+NOTE: Operator のインストールに数分かかるため、進捗を確認します。以下は正常に完了した際の画像です
+Application CR のステータスは OpenShift CLI からも確認することができます。
+作成される API リソースの相関は表示されないため、進捗を確認するには Web Console の方が便利です。
++
+image::app_camelk_completed.png[]
+
+正常に完了しない際は <<Troubleshooting>> の手順に従い調査します。
+
+== Group & Role
+
+以下のタスクを実施します。
+* グループを作成する
+* グループにユーザを追加する
+* グループに Namespace への admin 権限を付与する
+
+
+. Git Repository をクローンする
++
+----
+git clone 
+----
+
+. ApplicationSet CR を作成する
++
+----
+oc apply -f ./clusters/applicationset.yaml
+----
+
+. Branch を作成する
++
+----
+export BRANCH=my-team
+git branch ${BRANCH}
+git checkout ${BRANCH}
+----
+
+. `values.yaml` を作成し必要な値を定義する
++
+----
+cp -r tenant-projects/sample tenant-projects/${BRANCH}
+----
+
+. 変更をコミットし、Remote にプッシュする
+----
+git add tenant-projects/${BRANCH}
+git commit tenant-projects/${BRANCH}
+git push -u origin ${BRANCH}
+----
+
+. GitHub で PR を作成し、マージする
++
+
+. 
++
+----
+----
+
+== Troubleshooting
+
+=== Out Of Sync
+
+HEALTH STATUS は正常 (Healthy) ですが SYNC STATUS が異常 (OutOfSync) となり、Argo CD と Git Repository との間で `Out Of Sync` により同期に失敗しているケースです。
+
+. Application CR のステータスを確認する
++
+----
+$ oc -n openshift-gitops get app
+----
+NOTE: ApplicationSet CR を作成すると ApplicationSet CR が自動で Application CR を生成します。
+自動で生成される Application CR 名はユーザの `values.yaml` を配置する `tenant-projects/camelk/sample` のディレクトリ名から生成しています。
++
+.Example Output
+----
+NAME               SYNC STATUS   HEALTH STATUS
+camelk-sample-01   OutOfSync     Healthy
+----
+
+. Application CR の詳細を確認する
++
+----
+oc -n openshift-gitops describe app camelk-sample-01
+----
+NOTE: 以下は頻繁には起きませんが、Argo CD の Service Account が権限が不足しており IntegrationPlatform CR を修正できないケースです。
+Service Account (system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller) は全ての Namespace (cluster-wide) な権限を与えられているわけではないため、権限の問題で作成できない場合に `OutOfSync` が置きます。
++
+.Example Output
+----
+...
+Status:
+  Conditions:
+    Last Transition Time:  2023-11-16T04:45:38Z
+    Message:               Failed sync attempt to e8ec3aa6e4282a14ce242d15e0564078d3c96065: one or more objects failed to apply, reason: integrationplatforms.camel.apache.org "camel-k" is forbidden: User "system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller" cannot patch resource "integrationplatforms" in API group "camel.apache.org" in the namespace "camelk-test02"
+    Type:                  SyncError
+----
