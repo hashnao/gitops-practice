@@ -1,6 +1,6 @@
 namespaces:
   # 1st Namespace
-  - name: &name camelk-test00
+  - name: camelk-test00
     # Is this Namespace enabled or not
     enabled: true
     # Create a local Group with Admin users and the required rolebinding
