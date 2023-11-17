@@ -85,6 +85,62 @@ image::rosa_console.png[]
 +
 image::app_namespace_completed.png[]
 
+. 該当する Application CR の Sync と Health ステータスが正常であることを確認する
++
+----
+oc -n openshift-gitops get app
+----
+.Example Output
++
+----
+NAME               SYNC STATUS   HEALTH STATUS
+namespace-sample   Synced        Healthy
+----
+NOTE: 少なくとも `HEALTH STATUS` が `Healthy` であれば Application CR が生成する Namespace やグループが作成されています。
+
+- Namespace (camelk-test0{0,1}) が作成されることを確認する
++
+----
+oc get project -l argocd.argoproj.io/managed-by=openshift-gitops
+----
+.Example Output
++
+----
+NAME            DISPLAY NAME   STATUS
+camelk-test00                  Active
+camelk-test01                  Active
+----
+
+. グループ (sample-teams) にユーザ (apple, banana) を追加されることを確認する
++
+----
+oc get group sample-teams
+----
+.Example Output
++
+----
+NAME               USERS
+sample-teams       apple, banana
+----
+
+. グループ (sample-teams) に Namespace (camelk-test0{0,1}) に対する admin 権限が付与されることを確認する
++
+----
+oc -n camelk-test00 get rolebinding sample-teams -oyaml
+----
+.Example Output
++
+----
+kind: RoleBinding
+...
+  namespace: camelk-test00
+...
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: sample-teams
+----
+
 == Camel K Operator
 
 . Branch を作成する
@@ -174,6 +230,51 @@ Status:
     Message:               Failed sync attempt to e8ec3aa6e4282a14ce242d15e0564078d3c96065: one or more objects failed to apply, reason: integrationplatforms.camel.apache.org "camel-k" is forbidden: User "system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller" cannot patch resource "integrationplatforms" in API group "camel.apache.org" in the namespace "camelk-test02"
     Type:                  SyncError
 ----
+
+=== Sync failed
+
+始めて ROSA Cluster に Camelk K Operator をインストールする場合、Argo CD Console を開くと次の様に SYNC STATUS は OutOfSync で APP CONDITIONS は 1 Error が表示されるケースがあります。
+image::app_camelk_failed.png[]
+
+以下は CLI の結果で IntegrationPlatform CR を作成しようとするが、Camel K Operator がインストールされていないため、IntegrationPlatform CRD 自体がまだ作成されてないことが原因です。
+----
+$ oc describe app camelk-sample
+...
+Status:
+    Last Transition Time:  2023-11-17T06:43:45Z
+    Message:               Failed sync attempt to 30a0b737bc75757013cd2e50d7af85dfa359ad73: one or more synchronization tasks are not valid (retried 5 times).
+    Type:                  SyncError
+  Controller Namespace:    openshift-gitops
+  Health:
+    Status:  Healthy
+  Operation State:
+    Finished At:  2023-11-17T06:43:45Z
+    Message:      one or more synchronization tasks are not valid (retried 5 times).
+    Operation:
+      Initiated By:
+        Automated:  true
+      Retry:
+        Limit:  5
+      Sync:
+        Revision:  30a0b737bc75757013cd2e50d7af85dfa359ad73
+    Phase:         Failed
+    Retry Count:   5
+    Started At:    2023-11-17T06:38:35Z
+    Sync Result:
+      Resources:
+        Group:       camel.apache.org
+        Kind:        IntegrationPlatform
+        Message:     The Kubernetes API could not find camel.apache.org/IntegrationPlatform for requested resource camelk-test00/camel-k. Make sure the "IntegrationPlatform" CRD is installed on the destination cluster.
+----
+
+この様な場合は同期に失敗して処理が停止し、Application が作成すべき API リソースがまだ作成されていない可能性があるため、まず Camel K Operator がインストールされることを確認します。
+OperatorGroup -> Subscription -> ClusterRoleBinding -> IntegrationPlatform -> ConfigMap の順番で SYNC させ、状況を確認します。
+
+. SYNC ボタンをクリックして RETRY と OPERATORGROUP をチェックし、SYNCRONIZE ボタンをクリックする
++
+image::sync_og.png[]
+
+. 同様の手順で残りの リソース を順番に Sync する
 
 == Appendix
 
