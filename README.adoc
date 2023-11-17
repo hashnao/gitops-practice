@@ -5,14 +5,15 @@
 
 GitOps Operator を用いて以下のタスクを実施します、Helm Charts を利用します。
 
-. <<Namespace & Group>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
-  - 複数の Namespace を作成する
-  - グループを作成する
-  - グループにユーザを追加する
-  - グループに作成した Namespace に対する admin 権限を付与する
-. <<Camel K Operator>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
-  - Camel K Operator を指定の Namespace にインストールする
+* <<Namespace & Group>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
+  - 複数の Namespace (camelk-test0{0,1}) を作成する
+  - グループ (sample-teams) を作成する
+  - グループ (sample-teams) にユーザ (apple, banana) を追加する
+  - グループ (sample-teams) に Namespace (camelk-test0{0,1}) に対する admin 権限を付与する
+* <<Camel K Operator>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
+  - Camel K Operator を指定の Namespace (camelk-test00) にインストールする
   - Nexus の認証情報を定義する ConfigMap を作成する
+  - IntegrationPlatform CR を作成する
 
 NOTE: 一つの ApplicationSet CR を作成して <<Namespace & Group>> と <<Camel K Operator>> を一度に実施する想定ではなく、まず <<Namespace & Group>> を実行する ApplicationSet CR を作成して Namespace やグループの作成が完了した後に <<Camel K Operator>> を実行する ApplicationSet CR を作成し、Camel-K Operator をインストールします。
 
