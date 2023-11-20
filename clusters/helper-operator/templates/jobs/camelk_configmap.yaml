@@ -53,8 +53,8 @@ data:
         </server>
         <server>
           <id>mirror</id>
-          <username><NEXUS_USERNAME></username>
-          <password><NEXUS_PASSWORD></password>
+          <username>{{ $value.nexus.username }}</username>
+          <passworde>{{ $value.nexus.password }}</password>
         </server>
       </servers>
     </settings>
