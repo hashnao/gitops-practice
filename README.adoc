@@ -158,8 +158,8 @@ cp -r tenant-projects/camelk/sample tenant-projects/camelk/${BRANCH}
 vim tenant-projects/camelk/${BRANCH}/values.yaml
 ----
 NOTE: 設定例は以下のサンプルを参照下さい。
+Nexus Repository Manager のパスワードを暗号化する際の手順は <<Nexus Repository Manager Server Passowrd Encryption>> を参照下さい。
 +
-.tenant-projects/camelk/sample/values.yaml
 .https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/camelk/sample/values.yaml[tenant-projects/camelk/sample/values.yaml]
 ----
 include::tenant-projects/camelk/sample/values.yaml[]
@@ -361,5 +361,58 @@ spec:
         automated: (11)
           prune: false (12)
           selfHeal: true (13)
+----
+
+=== Nexus Repository Manager Server Passowrd Encryption
+
+https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/camelk/sample/values.yaml[tenant-projects/camelk/sample/values.yaml] に定義する Nexus Repository Manager のパスワードを暗号化します。
+詳細は https://maven.apache.org/guides/mini/guide-encryption.html[Apache Maven Project Password Encryption] を参照下さい。
+
+. Maven コンテナを起動、コンテナ内でシェルを起動する
++
+----
+podman run -it docker.io/library/maven:latest /bin/bash
+----
+NOTE: ここではコンテナイメージを利用しますが、`mvn` コマンドが利用できれば作業用のホストに maven をインストールするなどの方法でも構いません。
+
+. Master Password を生成する
++
+----
+MASTER_PASSWORD=$(mvn --encrypt-master-password <MASTER_PASSWORD>)
+----
+NOTE: `<MASTER_PASSWORD>` に任意の文字列を指定します。
+
+. settings-security.xml を作成し Master Password を定義する
++
+----
+cat > ~/.m2/settings-security.xml <<EOF
+<settingsSecurity>
+  <master>${MASTER_PASSWORD}</master>
+</settingsSecurity>
+EOF
+----
+
+. Nexus Repository Manager のパスワードを暗号化する
++
+----
+mvn --encrypt-password <NEXUS_PASSWORD>
+----
+NOTE: `<NEXUS_PASSWORD>` に Nexus Repository Manager のパスワードを指定します。
++
+.Example Output
+----
+{+ORKcatQya0HQsu/G+qiJKoyXEKoPLsQPbTqUCm798w=}
+----
+
+. values.yaml の `operators.camelk-operator.nexus.password` フィールドに出力された文字列を定義する
++
+NOTE: `{` と `}` を含みます。
+----
+operators:
+...
+    nexus:
+      username: nexus
+      password: "{+ORKcatQya0HQsu/G+qiJKoyXEKoPLsQPbTqUCm798w=}"
+      mirror_url: http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/
 ----
 

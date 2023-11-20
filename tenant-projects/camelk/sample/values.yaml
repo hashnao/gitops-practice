@@ -15,5 +15,5 @@ operators:
       notownnamespace: false
     nexus:
       username: nexus
-      password: nexus
+      password: "{+ORKcatQya0HQsu/G+qiJKoyXEKoPLsQPbTqUCm798w=}"
       mirror_url: http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/
