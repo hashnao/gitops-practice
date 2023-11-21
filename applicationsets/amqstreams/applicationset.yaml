@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: camelk
+  name: amqstreams
   namespace: openshift-gitops
 spec:
   goTemplate: true
@@ -10,7 +10,7 @@ spec:
   generators:
     - git:
         files:
-          - path: tenant-projects/camelk/**/values.yaml
+          - path: tenant-projects/amqstreams/**/values.yaml
         repoURL: "https://github.com/hashnao/gitops-practice"
         revision: main
   template:
@@ -19,23 +19,18 @@ spec:
     spec:
       info:
         - name: Description
-          value: Onboarding Workload to the cluster
+          value: Provisioning AMQ Streams
       destination:
         server: "https://kubernetes.default.svc"
       project: default
       source:
         repoURL: "https://github.com/hashnao/gitops-practice"
-        targetRevision: settingsxml-encryption
+        targetRevision: main
         path: clusters/helper-operator
         helm:
           valueFiles:
             - "/{{ .path.path }}/values.yaml"
             - /tenant-projects/values-global.yaml
-          parameters:
-          - name: "operators.camelk-operator.nexus.username"
-            value: nexus
-          - name: "operators.camelk-operator.nexus.password"
-            value: nexus
       syncPolicy:
         automated:
           prune: false
