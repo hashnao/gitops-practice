@@ -2,7 +2,7 @@ operators:
   camelk-operator:
     enabled: true
     namespace:
-      name: camelk-test00
+      name: camelk-test01
       create: false
     subscription:
       channel: 1.10.x
