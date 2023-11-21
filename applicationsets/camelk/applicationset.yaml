@@ -25,7 +25,7 @@ spec:
       project: default
       source:
         repoURL: "https://github.com/hashnao/gitops-practice"
-        targetRevision: settingsxml-encryption
+        targetRevision: main
         path: clusters/helper-operator
         helm:
           valueFiles:

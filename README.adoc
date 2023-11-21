@@ -338,7 +338,7 @@ Cf. https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/[Automated Syn
 `selfHeal: true` は Argo CD はデプロイされたアプリケーションの状態を常に監視し Git Repository のマニフェストとクラスタのライブの変更の違いを検出し、自動で修正します。
 Cf. https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/#automatic-self-healing[Automatic Self-Healing]
 
-.applicationsets/namespace/applicationset.yaml
+.https://github.com/hashnao/gitops-practice/blob/main/applicationsets/namespace/applicationset.yaml[applicationsets/namespace/applicationset.yaml]
 ----
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
