@@ -158,7 +158,7 @@ cp -r tenant-projects/camelk/sample tenant-projects/camelk/${BRANCH}
 vim tenant-projects/camelk/${BRANCH}/values.yaml
 ----
 NOTE: 設定例は以下のサンプルを参照下さい。
-Nexus Repository Manager のパスワードを暗号化する際の手順は <<Nexus Repository Manager Server Passowrd Encryption>> を参照下さい。
+この例では Nexus のパスワードを暗号した後に GitHub に格納します。Nexus Repository Manager のパスワードを暗号化する際の手順は <<Nexus Repository Manager Server Passowrd Encryption>> を参照下さい。
 +
 .https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/camelk/sample/values.yaml[tenant-projects/camelk/sample/values.yaml]
 ----
@@ -416,3 +416,26 @@ operators:
       mirror_url: http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/
 ----
 
+=== Helm Parameters
+
+https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/camelk/sample/values.yaml[tenant-projects/camelk/sample/values.yaml] に定義する Nexus Repository Manager のパスワードを ApplicationSet CR に https://argo-cd.readthedocs.io/en/stable/user-guide/helm/#helm-parameters[Helm Parameters] を用いて定義してオーバーライドさせます。
+<<Nexus Repository Manager Server Passowrd Encryption>> で解説した様に暗号化した認証情報を GitHub に格納しません。
+
+ApplicationSet CR を以下のように定義します。
+----
+spec:
+ template:
+    spec:
+      source:
+        helm:
+          parameters:
+          - name: "operators.camelk-operator.nexus.password"
+            value: <PASSWORD>
+----
+NOTE: `"operators.camelk-operator.nexus.password"` は values.yaml に定義する YAML の階層構造と合致させます。
+----
+operators:
+  camelk-operator:
+    nexus:
+      password: "{+ORKcatQya0HQsu/G+qiJKoyXEKoPLsQPbTqUCm798w=}"
+----
