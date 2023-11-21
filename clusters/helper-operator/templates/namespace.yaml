@@ -9,6 +9,7 @@ metadata:
   name: {{ $value.namespace.name | quote }}
   labels:
     openshift.io/cluster-monitoring: "true"
+    argocd.argoproj.io/managed-by: {{ $.Values.global.application_gitops_namespace }}
     {{- include "common.labels" $ | nindent 4 }}
   {{- if or ($value.namespace.descr) ($value.namespace.displayname) }}
   annotations:
