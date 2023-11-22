@@ -19,7 +19,7 @@ spec:
     spec:
       info:
         - name: Description
-          value: Onboarding Workload to the cluster
+          value: Provisioning Camel K Operator
       destination:
         server: "https://kubernetes.default.svc"
       project: default
