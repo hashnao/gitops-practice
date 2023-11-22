@@ -23,7 +23,7 @@ NOTE: 一つの ApplicationSet CR を作成して <<Namespace & Group>> と <<Ca
 
 * GitOps Operator をインストール後に ArgoCD CR に以下の変更を加える
 ----
-cat <EOF>> | oc apply -f -
+cat <<EOF | oc apply -f -
 apiVersion: argoproj.io/v1beta1
 kind: ArgoCD
 metadata:
