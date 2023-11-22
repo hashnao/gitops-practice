@@ -9,7 +9,7 @@ metadata:
   labels:
     {{- include "common.labels" $ | nindent 4 }}
   annotations:
-    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "2" | quote }}
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "4" | quote }}
 spec:
   build:
     maven:

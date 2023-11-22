@@ -11,7 +11,7 @@ metadata:
     {{- include "common.labels" $ | nindent 4 }}
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "0" | quote }}
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "1" | quote }}
 {{- if $value.operatorgroup.notownnamespace }}
 spec: {}
 {{- else }}
