@@ -10,6 +10,7 @@ metadata:
     {{- include "common.labels" $ | nindent 4 }}
   annotations:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
+    argocd.argoproj.io/sync-options: ServerSideApply=true
 spec:
   build:
     maven:
