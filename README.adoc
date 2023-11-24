@@ -67,7 +67,7 @@ NOTE: この時点では Camel K Operator をインストールしていない�
 ----
 export URL=https://github.com/hashnao/gitops-practice
 git clone ${URL}
-cd gitops-samples
+cd gitops-practice
 ----
 
 == Namespace & Group
