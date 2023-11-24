@@ -16,5 +16,8 @@ spec:
         ConfigMapKeyRef:
           key: settings.xml
           name: maven-settings
+  kamelet: {}
+  resources: {}
+  profile: OpenShift
 {{- end }}
 {{- end }}
