@@ -217,19 +217,35 @@ git push -u origin ${BRANCH}
 . GitHub で PR を作成し、マージする
 +
 
-. ApplicationSet CR に Nexus 認証情報を定義する
+. ApplicationSet CR を修正し、ディレクトリや Nexus の認証情報を定義する
++
+NOTE: ApplicationSet CR は GitHub にプッシュする必要はありません。
+以下は git diff の結果です、修正する箇所は # を参照下さい。
 +
 ----
-spec:
- template:
-    spec:
-      source:
-        helm:
-          parameters:
-          - name: "operators.camelk-operator.nexus.username"
-            value: <USERNAME>
-          - name: "operators.camelk-operator.nexus.password"
-            value: <PASSWORD>
+diff --git a/applicationsets/camelk/applicationset.yaml b/applicationsets/camelk/applicationset.yaml
+--- a/applicationsets/camelk/applicationset.yaml
++++ b/applicationsets/camelk/applicationset.yaml
+   generators:
+     - git:
+         files:
+-          - path: tenant-projects/camelk/*/values.yaml
++          - path: tenant-projects/camelk/my-team/values.yaml # 新しい values.yaml を配置するディレクトリ名に変更する
+         repoURL: "https://github.com/hashnao/gitops-practice"
+         revision: main
+   template:
+@@ -33,9 +33,9 @@ spec:
+             - /tenant-projects/values-global.yaml
+           parameters:
+           - name: "operators.camelk-operator.nexus.username"
+-            value: <USERNAME>
++            value: nexus # Nexus Repository Manager のユーザ名を指定する
+           - name: "operators.camelk-operator.nexus.password"
+-            value: <PASSWORD>
++            value: nexus # Nexus Repository Manager のパスワードを指定する
+       syncPolicy:
+         automated:
+           prune: false
 ----
 NOTE: ApplicationSet CR の以下の箇所に Nexus Repository Manager のユーザ名とパスワードを定義し、https://argo-cd.readthedocs.io/en/stable/user-guide/helm/#helm-parameters[Helm Parameters] を用いて定義してオーバーライドさせます。
 values.yaml は GitHub にプッシュする必要があり values.yaml に認証情報を定義すると GitHub に格納されるためです。
@@ -373,7 +389,7 @@ path に指定したディレクトリだけを対象とし、再帰的に配下
 (11) automated を指定することで自動で Git Repository から同期します。指定しない場合は Argo CD Console から手動で Sync する必要があります。
 Cf. https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/[Automated Sync Policy]
 
-(12) automated を定義するとデフォルトで Argo CD は Git Repository から削除された設定を検出するとリソースを削除しません。(prune: false)
+(12) `prune: false` を指定するとデフォルトで Argo CD は Git Repository から削除された設定を検出するとリソースを削除しません。
 `prune: true` を指定するとリソースを削除します。Cf. https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/#automatic-pruning[Automatic Pruning]
 
 (13) デフォルトでクラスタに適用した変更は automated sync を実行しません。
@@ -394,7 +410,7 @@ spec:
   generators:
     - git:
         files: (2)
-          - path: tenant-projects/namespace/**/values.yaml
+          - path: tenant-projects/namespace/*/values.yaml
         repoURL: "https://github.com/hashnao/gitops-practice"
         revision: main
   template:
