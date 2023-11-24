@@ -60,6 +60,7 @@ oc adm policy add-cluster-role-to-user integrationplatforms.camel.apache.org-v1-
 ----
 NOTE: https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/camelk_integrationplan.yaml[camelk_integrationplan.yaml] で IntegrationPlatform CR に設定を加えるため、 Cluster Role (integrationplatforms.camel.apache.org-v1-edit) を GitOps Operator の Service Account に付与する必要があります。
 ClusterRoleBinding CR を GitOps で適用すると複数の ApplictionSet を作成すると ClusterRoleBinding CR が複数の Application に共有され https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/#fail-the-sync-if-a-shared-resource-is-found[SharedResourceWarning] が出力され Application のステータスは正常でも OutofSync が起き続けるため、事前に権限を付与することでリソースの競合を回避します。
+NOTE: この時点では Camel K Operator をインストールしていないため、該当する Cluster Role も作成されておらず、**Warning: role 'integrationplatforms.camel.apache.org-v1-edit' not found** と出力されますが、そのまま進めます。
 
 * Git Repository をクローンする
 ----
