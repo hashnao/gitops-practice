@@ -10,7 +10,7 @@ spec:
   generators:
     - git:
         files:
-          - path: tenant-projects/camelk/**/values.yaml
+          - path: tenant-projects/camelk/*/values.yaml
         repoURL: "https://github.com/hashnao/gitops-practice"
         revision: main
   template:
@@ -33,9 +33,9 @@ spec:
             - /tenant-projects/values-global.yaml
           parameters:
           - name: "operators.camelk-operator.nexus.username"
-            value: nexus
+            value: <USERNAME>
           - name: "operators.camelk-operator.nexus.password"
-            value: nexus
+            value: <PASSWORD>
       syncPolicy:
         automated:
           prune: false
