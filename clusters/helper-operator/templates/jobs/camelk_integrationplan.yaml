@@ -13,7 +13,7 @@ spec:
   build:
     maven:
       settings:
-        ConfigMapKeyRef:
+        configMapKeyRef:
           key: settings.xml
           name: maven-settings
   kamelet: {}
