@@ -15,7 +15,7 @@ spec:
         revision: main
   template:
     metadata:
-      name: "test-{{ index .path.segments 1 | normalize }}-{{ .path.basename }}"
+      name: "{{ index .path.segments 1 | normalize }}-{{ .path.basename }}"
     spec:
       info:
         - name: Description
