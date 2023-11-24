@@ -54,6 +54,13 @@ NOTE: Operator をインストール後に Custom Resource を作成する場合
 Annotation に https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/#sync-phases-and-waves[Sync Phases and Waves] に基づき Wave を Subscription (wave: 1) -> IntegrationPlatform CR (wave: 2) の様にして順序関係を定義しても、<<Sync failed>> に記載するケースがおきるため Wave だけで解決はしません。
 そのため Lua をベースに Subscription CR のステータス (status.state フィールド) が `AtLatestKnown` である場合に Argo CD が Application が `Healthy` であるとみなす様に ArgoCD CR に変更を加えます。Cf. https://piotrminkowski.com/2023/05/05/manage-kubernetes-operators-with-argocd/[Manage Kubernetes Operators with ArgoCD]
 
+* GitOps Operator の Service Account に IntegrationPlatform CR を edit する権限を付与する
+----
+oc adm policy add-cluster-role-to-user integrationplatforms.camel.apache.org-v1-edit system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller
+----
+NOTE: https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/camelk_integrationplan.yaml[camelk_integrationplan.yaml] で IntegrationPlatform CR に設定を加えるため、 Cluster Role (integrationplatforms.camel.apache.org-v1-edit) を GitOps Operator の Service Account に付与する必要があります。
+ClusterRoleBinding CR を GitOps で適用すると複数の ApplictionSet を作成すると ClusterRoleBinding CR が複数の Application に共有され https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/#fail-the-sync-if-a-shared-resource-is-found[SharedResourceWarning] が出力され Application のステータスは正常でも OutofSync が起き続けるため、事前に権限を付与することでリソースの競合を回避します。
+
 * Git Repository をクローンする
 ----
 export URL=https://github.com/hashnao/gitops-practice
