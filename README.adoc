@@ -140,7 +140,7 @@ namespace-sample   Synced        Healthy
 ----
 NOTE: 少なくとも `HEALTH STATUS` が `Healthy` であれば Application CR が生成する Namespace やグループが作成されています。
 
-- Namespace (camelk-test0{0,1}) が作成されることを確認する
+. Namespace (camelk-test0{0,1}) が作成されることを確認する
 +
 ----
 oc get project -l argocd.argoproj.io/managed-by=openshift-gitops
