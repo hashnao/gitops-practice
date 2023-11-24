@@ -21,6 +21,39 @@ NOTE: 一つの ApplicationSet CR を作成して <<Namespace & Group>> と <<Ca
 
 * 製品ガイドに従い https://docs.openshift.com/gitops/1.10/installing_gitops/installing-openshift-gitops.html[OpenShift GitOps Operator] をインストールする
 
+* GitOps Operator をインストール後に ArgoCD CR に以下の変更を加える
+----
+cat <<EOF | oc apply -f -
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  name: openshift-gitops
+  namespace: openshift-gitops
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration:
+spec:
+  extraConfig:
+    resource.customizations: |
+      operators.coreos.com/Subscription:
+        health.lua: |
+          hs = {}
+          hs.status = "Progressing"
+          hs.message = ""
+          if obj.status ~= nil then
+            if obj.status.state ~= nil then
+              if obj.status.state == "AtLatestKnown" then
+                hs.message = obj.status.state .. " - " .. obj.status.currentCSV
+                hs.status = "Healthy"
+              end
+            end
+          end
+          return hs
+EOF
+----
+NOTE: Operator をインストール後に Custom Resource を作成する場合は Subscription CR を作成し Operator をインストールする -> CRD が作成されるまで待つ -> CR を作成する順序を意識する必要があります。
+Annotation に https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/#sync-phases-and-waves[Sync Phases and Waves] に基づき Wave を Subscription (wave: 1) -> IntegrationPlatform CR (wave: 2) の様にして順序関係を定義しても、<<Sync failed>> に記載するケースがおきるため Wave だけで解決はしません。
+そのため Lua をベースに Subscription CR のステータス (status.state フィールド) が `AtLatestKnown` である場合に Argo CD が Application が `Healthy` であるとみなす様に ArgoCD CR に変更を加えます。Cf. https://piotrminkowski.com/2023/05/05/manage-kubernetes-operators-with-argocd/[Manage Kubernetes Operators with ArgoCD]
+
 * Git Repository をクローンする
 ----
 export URL=https://github.com/hashnao/gitops-practice

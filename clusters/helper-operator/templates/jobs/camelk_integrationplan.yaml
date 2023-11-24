@@ -6,16 +6,18 @@ apiVersion: camel.apache.org/v1
 metadata:
   name: camel-k
   namespace: {{ $value.namespace.name | quote }}
-  labels:
-    {{- include "common.labels" $ | nindent 4 }}
   annotations:
-    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "2" | quote }}
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true, Replace=true
 spec:
   build:
     maven:
       settings:
-        ConfigMapKeyRef:
+        configMapKeyRef:
           key: settings.xml
           name: maven-settings
+  kamelet: {}
+  resources: {}
+  profile: OpenShift
 {{- end }}
 {{- end }}

@@ -5,11 +5,10 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: integrationplatforms.camel.apache.org-v1-edit
-  namespace: {{ $value.namespace.name | quote }}
   labels:
     {{- include "common.labels" $ | nindent 4 }}
   annotations:
-    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "1" | quote }}
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "2" | quote }}
 subjects:
   - kind: ServiceAccount
     name: openshift-gitops-argocd-application-controller

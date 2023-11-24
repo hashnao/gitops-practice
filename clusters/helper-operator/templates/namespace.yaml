@@ -13,6 +13,7 @@ metadata:
     {{- include "common.labels" $ | nindent 4 }}
   {{- if or ($value.namespace.descr) ($value.namespace.displayname) }}
   annotations:
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "0" | quote }}
     {{- if $value.namespace.descr }}
     openshift.io/description: {{ $value.namespace.descr }}
     {{- end }}
