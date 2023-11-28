@@ -23,14 +23,12 @@ NOTE: 一つの ApplicationSet CR を作成して <<Namespace & Group>> と <<Ca
 
 * GitOps Operator をインストール後に ArgoCD CR に以下の変更を加える
 ----
-cat <<EOF | oc apply -f -
+cat << EOF | oc apply -f -
 apiVersion: argoproj.io/v1beta1
 kind: ArgoCD
 metadata:
   name: openshift-gitops
   namespace: openshift-gitops
-  annotations:
-    kubectl.kubernetes.io/last-applied-configuration:
 spec:
   extraConfig:
     resource.customizations: |
@@ -49,6 +47,12 @@ spec:
           end
           return hs
 EOF
+----
+NOTE: コマンドを実行すると以下の Warning が出力されますが、`argocd.argoproj.io/openshift-gitops configured` が表示されれば設定は適用されています。
+.Example Output
+----
+Warning: resource argocds/openshift-gitops is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by oc apply. oc apply should only be used on resources created declaratively by either oc create --save-config or oc apply. The missing annotation will be patched automatically.
+argocd.argoproj.io/openshift-gitops configured
 ----
 NOTE: Operator をインストール後に Custom Resource を作成する場合は Subscription CR を作成し Operator をインストールする -> CRD が作成されるまで待つ -> CR を作成する順序を意識する必要があります。
 Annotation に https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/#sync-phases-and-waves[Sync Phases and Waves] に基づき Wave を Subscription (wave: 1) -> IntegrationPlatform CR (wave: 2) の様にして順序関係を定義しても、<<Sync failed>> に記載するケースがおきるため Wave だけで解決はしません。
