@@ -32,13 +32,12 @@ spec:
             - "/{{ .path.path }}/values.yaml"
             - /tenant-projects/values-global.yaml
           parameters:
-          - name: "operators.camelk-operator.nexus.username"
+          - name: "nexus.username"
             value: <USERNAME>
-          - name: "operators.camelk-operator.nexus.password"
+          - name: "nexus.password"
             value: <PASSWORD>
-          - name: "operators.camelk-operator.nexus.mirror_url"
+          - name: "nexus.mirror_url"
             value: <NEXUS_URL>
-            http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/
       syncPolicy:
         automated:
           prune: false
