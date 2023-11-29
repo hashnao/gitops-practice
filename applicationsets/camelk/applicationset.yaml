@@ -38,7 +38,6 @@ spec:
             value: <PASSWORD>
           - name: "operators.camelk-operator.nexus.mirror_url"
             value: <NEXUS_URL>
-            http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/
       syncPolicy:
         automated:
           prune: false

@@ -3,15 +3,17 @@
 
 = Onboarding
 
-GitOps Operator を用いて以下のタスクを実施します、Helm Charts を利用します。
+GitOps Operator を用いて以下のタスクを実施します。
 
-* <<Namespace & Group>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
+NOTE: 環境に応じて変数を代入するため Helm Charts (values.yaml) を用います。
+
+* <<Namespace & Group>> のセクションで呼び出す Helm Charts (clusters/helper-proj-onboarding) は 以下のタスクを実施します。
   - 複数の Namespace (camelk-test0{0,1}) を作成する
   - グループ (sample-teams) を作成する
   - グループ (sample-teams) にユーザ (apple, banana) を追加する
   - グループ (sample-teams) に Namespace (camelk-test0{0,1}) に対する admin 権限を付与する
 * <<Camel K Operator>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
-  - Camel K Operator を指定の Namespace (camelk-test00) にインストールする
+  - Camel K Operator を指定の Namespace (camelk-test0{0,1}) にインストールする
   - Nexus の認証情報を定義する ConfigMap を作成する
   - IntegrationPlatform CR を作成する
 
@@ -49,7 +51,6 @@ spec:
 EOF
 ----
 NOTE: コマンドを実行すると以下の Warning が出力されますが、`argocd.argoproj.io/openshift-gitops configured` が表示されれば設定は適用されています。
-.Example Output
 ----
 Warning: resource argocds/openshift-gitops is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by oc apply. oc apply should only be used on resources created declaratively by either oc create --save-config or oc apply. The missing annotation will be patched automatically.
 argocd.argoproj.io/openshift-gitops configured
@@ -76,6 +77,14 @@ cd gitops-practice
 
 == Namespace & Group
 
+. ApplicationSet CR を作成する
++
+----
+oc apply -f ./applicationsets/namespace/applicationset.yaml
+----
+NOTE: サンプルの tenant-projects/namespace/values.yaml を Main ブランチに配置しているため ApplicationSet CR を作成すると Application CR が生成され、Namespace などを作成する Helm Charts が実行されます。
+そのためこの時点で camelk-test0{,1} Namespace が作成されます。
+
 . Branch を作成する
 +
 ----
@@ -90,7 +99,7 @@ git checkout ${BRANCH}
 cp -r tenant-projects/namespace/sample tenant-projects/namespace/${BRANCH}
 vim tenant-projects/namespace/${BRANCH}/values.yaml
 ----
-NOTE: 以下のサンプルは先程作成した 2 つの Namespace (camelk-test0{0,1}) に Camel K Operator をインストールします。
+NOTE: Namespace, グループ名、ユーザ名を変更します。
 +
 .https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/namespace/sample/values.yaml[tenant-projects/namespace/sample/values.yaml]
 ----
@@ -188,6 +197,50 @@ subjects:
 
 == Camel K Operator
 
+. ApplicationSet CR を修正し、ディレクトリや Nexus の認証情報を定義する
++
+----
+vim applicationsets/camelk/applicationset.yaml
+----
+NOTE: ApplicationSet CR は GitHub にプッシュする必要はありません。
+以下は diff の結果です、修正する箇所は # がコメントしている箇所が該当します。
++
+----
+$ git diff applicationsets/camelk/applicationset.yaml
+diff --git a/applicationsets/camelk/applicationset.yaml b/applicationsets/camelk/applicationset.yaml
+index 80df157..d7bc022 100644
+--- a/applicationsets/camelk/applicationset.yaml
++++ b/applicationsets/camelk/applicationset.yaml
+@@ -33,12 +33,11 @@ spec:
+             - /tenant-projects/values-global.yaml
+           parameters:
+           - name: "nexus.username"
+-            value: <USERNAME>
++            value: nexus # Nexus Repository Manager のユーザ名を指定する
+           - name: "nexus.password"
+-            value: <PASSWORD>
++            value: nexus # Nexus Repository Manager のパスワードを指定する
+           - name: "nexus.mirror_url"
+-            value: <NEXUS_URL>
+-            http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/
++            value: http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/ # Maven Repository (Nexus Repository Manager) の Kubernetes Service 経由の URL を指定する
+       syncPolicy:
+         automated:
+           prune: false
+----
+NOTE: ApplicationSet CR の以下の箇所に Nexus Repository Manager のユーザ名とパスワードを定義し、https://argo-cd.readthedocs.io/en/stable/user-guide/helm/#helm-parameters[Helm Parameters] を用いて定義してオーバーライドさせます。
+values.yaml は GitHub にプッシュする必要があり values.yaml に認証情報を定義すると GitHub に格納されるためです。
+
+. ApplicationSet CR を作成する
++
+----
+oc apply -f ./applicationsets/camelk/applicationset.yaml
+----
+NOTE: サンプルの tenant-projects/camelk/sample/values.yaml を Main ブランチに配置しているため ApplicationSet CR を作成すると Application CR が生成され、Camel K Operator をインストールする Helm Charts が実行されます。
+そのためこの時点で camelk-test0{,1} Namespace に Camel K Operator がインストールされます。
++
+image::app_camelk_completed.png[]
+
 . Branch を作成する
 +
 ----
@@ -202,7 +255,7 @@ git checkout ${BRANCH}
 cp -r tenant-projects/camelk/sample tenant-projects/camelk/${BRANCH}
 vim tenant-projects/camelk/${BRANCH}/values.yaml
 ----
-NOTE: 主に namespace を修正します、設定例は以下のサンプルを参照下さい。
+NOTE: 主に Camel K Operator をインストールする namespace を修正します、設定例は以下のサンプルを参照下さい。
 +
 .https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/camelk/sample[tenant-projects/camelk/sample/values.yaml]
 ----
@@ -219,49 +272,7 @@ git push -u origin ${BRANCH}
 
 . GitHub で PR を作成し、マージする
 +
-
-. ApplicationSet CR を修正し、ディレクトリや Nexus の認証情報を定義する
-+
-NOTE: ApplicationSet CR は GitHub にプッシュする必要はありません。
-以下は git diff の結果です、修正する箇所は # を参照下さい。
-+
-----
-diff --git a/applicationsets/camelk/applicationset.yaml b/applicationsets/camelk/applicationset.yaml
---- a/applicationsets/camelk/applicationset.yaml
-+++ b/applicationsets/camelk/applicationset.yaml
-   generators:
-     - git:
-         files:
--          - path: tenant-projects/camelk/*/values.yaml
-+          - path: tenant-projects/camelk/my-team/values.yaml # 新しい values.yaml を配置するディレクトリ名に変更する
-         repoURL: "https://github.com/hashnao/gitops-practice"
-         revision: main
-   template:
-@@ -33,9 +33,9 @@ spec:
-             - /tenant-projects/values-global.yaml
-           parameters:
-           - name: "operators.camelk-operator.nexus.username"
--            value: <USERNAME>
-+            value: nexus # Nexus Repository Manager のユーザ名を指定する
-           - name: "operators.camelk-operator.nexus.password"
--            value: <PASSWORD>
-+            value: nexus # Nexus Repository Manager のパスワードを指定する
-           - name: "operators.camelk-operator.nexus.mirror_url"
--            value: <NEXUS_URL>
-+            http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/ # Maven Repository (Nexus Repository Manager) の Kubernetes Service 経由の URL を指定する
-       syncPolicy:
-         automated:
-           prune: false
-----
-NOTE: ApplicationSet CR の以下の箇所に Nexus Repository Manager のユーザ名とパスワードを定義し、https://argo-cd.readthedocs.io/en/stable/user-guide/helm/#helm-parameters[Helm Parameters] を用いて定義してオーバーライドさせます。
-values.yaml は GitHub にプッシュする必要があり values.yaml に認証情報を定義すると GitHub に格納されるためです。
-
-. ApplicationSet CR を作成する
-+
-----
-oc apply -f ./applicationsets/camelk/applicationset.yaml
-----
-NOTE: ApplicationSet CR を作成すると Application CR が作成され、Helm Charts が開始されます。
+NOTE: PR をマージすると Argo CD が差分 (追加した values.yaml) を検出し、values.yaml に定義した Namespace に Camel K Operator をインストールします。
 
 . Argo CD Web Console からアプリケーション (Application CR) の進捗を確認する
 +
@@ -314,6 +325,7 @@ Status:
 === Sync failed
 
 始めて ROSA Cluster に Camelk K Operator をインストールする場合、Argo CD Console を開くと次の様に SYNC STATUS は OutOfSync で APP CONDITIONS は 1 Error が表示されるケースがあります。
+
 image::app_camelk_failed.png[]
 
 以下は CLI の結果で IntegrationPlatform CR を作成しようとするが、Camel K Operator がインストールされていないため、IntegrationPlatform CRD 自体がまだ作成されてないことが原因です。
@@ -441,6 +453,33 @@ spec:
         automated: (11)
           prune: false (12)
           selfHeal: true (13)
+----
+
+=== ApplicationSet (Camel K Operator)
+
+以下は <<Camel K Operator>> のセクションで利用する ApplicationSet CR (applicationsets/camelk/applicationset.yaml) に定義するフィールドを解説します。
+差分だけを対象とします。
+
+(1) Nexus Repository Manager のユーザ名を指定する
+
+(2) Nexus Repository Manager のパスワードを指定する
+
+(3) Maven Repository (Nexus Repository Manager) の Kubernetes Service 経由の URL を指定する
+i.e. http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/ 
+
+.https://github.com/hashnao/gitops-practice/blob/main/applicationsets/camelk/applicationset.yaml[applicationsets/camelk/applicationset.yaml]
+----
+          parameters:
+          - name: "nexus.username"
+            value: <USERNAME> (1)
+          - name: "nexus.password"
+            value: <PASSWORD> (2)
+          - name: "nexus.mirror_url"
+            value: <NEXUS_URL> (3)
+      syncPolicy:
+        automated:
+          prune: false
+          selfHeal: true
 ----
 
 === Nexus Repository Manager Server Passowrd Encryption
