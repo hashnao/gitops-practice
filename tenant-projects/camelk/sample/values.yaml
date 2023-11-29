@@ -1,17 +1,29 @@
 operators:
-  camelk-operator:
+  camelk-operator0:
     enabled: true
     namespace:
       name: camelk-test00
       create: false
     subscription:
+      operatorName: red-hat-camel-k
       channel: 1.10.x
       approval: Automatic
-      operatorName: red-hat-camel-k
       source: redhat-operators
       sourceNamespace: openshift-marketplace
     operatorgroup:
       create: true
       notownnamespace: false
-    nexus:
-      mirror_url: http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/
+  camelk-operator1:
+    enabled: true
+    namespace:
+      name: camelk-test01
+      create: false
+    subscription:
+      operatorName: red-hat-camel-k
+      channel: 1.10.x
+      approval: Automatic
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    operatorgroup:
+      create: true
+      notownnamespace: false

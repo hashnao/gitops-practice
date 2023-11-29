@@ -90,8 +90,7 @@ git checkout ${BRANCH}
 cp -r tenant-projects/namespace/sample tenant-projects/namespace/${BRANCH}
 vim tenant-projects/namespace/${BRANCH}/values.yaml
 ----
-NOTE: 設定例は以下のサンプルを参照下さい。
-その他の変数など詳細は https://github.com/tjungbauer/helm-charts/tree/main/charts/helper-operator を参照下さい。
+NOTE: 以下のサンプルは先程作成した 2 つの Namespace (camelk-test0{0,1}) に Camel K Operator をインストールします。
 +
 .https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/namespace/sample/values.yaml[tenant-projects/namespace/sample/values.yaml]
 ----
@@ -247,6 +246,9 @@ diff --git a/applicationsets/camelk/applicationset.yaml b/applicationsets/camelk
            - name: "operators.camelk-operator.nexus.password"
 -            value: <PASSWORD>
 +            value: nexus # Nexus Repository Manager のパスワードを指定する
+           - name: "operators.camelk-operator.nexus.mirror_url"
+-            value: <NEXUS_URL>
++            http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/ # Maven Repository (Nexus Repository Manager) の Kubernetes Service 経由の URL を指定する
        syncPolicy:
          automated:
            prune: false
