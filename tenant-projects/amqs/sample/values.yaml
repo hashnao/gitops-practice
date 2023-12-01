@@ -1,6 +1,6 @@
 operators:
   amqs-operator0:
-    enabled: true
+    kafka: true
     namespace:
       name: amqs-test00
       create: false
