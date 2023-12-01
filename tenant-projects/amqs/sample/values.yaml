@@ -1,6 +1,9 @@
 operators:
   amqs-operator0:
     enabled: true
+    kafka:
+      version: 3.5.0
+      replicas: 3
     namespace:
       name: amqs-test00
       create: false
