@@ -1,8 +1,6 @@
 operators:
   camelk-operator0:
     enabled: true
-    nexus:
-      enabled: true
     namespace:
       name: camelk-test00
       create: false
@@ -17,8 +15,6 @@ operators:
       notownnamespace: false
   camelk-operator1:
     enabled: true
-    nexus:
-      enabled: true
     namespace:
       name: camelk-test01
       create: false
