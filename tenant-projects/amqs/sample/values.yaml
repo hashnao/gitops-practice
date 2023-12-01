@@ -34,3 +34,38 @@ operators:
       requests:
         cpu: "0.5"
         memory: 1Gi
+  amqs-operator1:
+    enabled: true
+    namespace:
+      name: amqs-test01
+      create: false
+    subscription:
+      channel: amq-streams-2.5.x
+      approval: Automatic
+      operatorName: amq-streams
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    operatorgroup:
+      create: true
+      notownnamespace: false
+    kafka:
+      enabled: true
+      version: "3.5.0"
+      protocol_version: "3.5"
+      replicas: 3
+      storage: 10Gi
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: "1"
+        memory: 2Gi
+    zookeeper:
+      replicas: 3
+      storage: 10Gi
+      limits:
+        cpu: "0.5"
+        memory: 1Gi
+      requests:
+        cpu: "0.5"
+        memory: 1Gi
