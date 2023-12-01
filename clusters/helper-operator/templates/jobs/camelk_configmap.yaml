@@ -1,3 +1,5 @@
+{{- range $key, $value := .Values.operators }}
+{{- if eq ($value.enabled | toString) "true" }}
 {{- if .Values.nexus }}
 ---
 apiVersion: v1
@@ -57,4 +59,6 @@ data:
         </server>
       </servers>
     </settings>
+{{- end }}
+{{- end }}
 {{- end }}
