@@ -1,4 +1,4 @@
-{{- With .Values.nexus }}
+{{- if .Values.nexus }}
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
 ---

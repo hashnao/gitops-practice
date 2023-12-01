@@ -1,4 +1,4 @@
-{{- With .Values.kafka }}
+{{- if .Values.kafka }}
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
 ---
