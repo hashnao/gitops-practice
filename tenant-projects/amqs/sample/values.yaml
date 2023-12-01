@@ -3,7 +3,7 @@ operators:
     enabled: true
     namespace:
       name: amqs-test00
-      create: false
+      create: true
     subscription:
       channel: 2.5.x
       approval: Automatic
