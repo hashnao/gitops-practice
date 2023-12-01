@@ -5,7 +5,7 @@ operators:
       name: amqs-test00
       create: false
     subscription:
-      channel: 2.5.x
+      channel: amq-streams-2.5.x
       approval: Automatic
       operatorName: amq-streams
       source: redhat-operators
