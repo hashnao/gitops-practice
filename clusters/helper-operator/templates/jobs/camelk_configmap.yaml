@@ -1,7 +1,6 @@
 {{- if .Values.nexus }}
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
-{{- if eq ($value.nexus.enabled | toString) "true" }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -60,7 +59,6 @@ data:
         </server>
       </servers>
     </settings>
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
