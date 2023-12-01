@@ -8,7 +8,7 @@ metadata:
   namespace: {{ $value.namespace.name | quote }}
 spec:
   kafka:
-    version: {{ $value.kafka.version | default "3.6.0" | quote }}
+    version: {{ $value.kafka.version | default "3.5.0" | quote }}
     replicas: {{ $value.kafka.replicas | default "3" | quote }}
     listeners:
       - name: plain
@@ -133,6 +133,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: kafka-metrics
+  namespace: {{ $value.namespace.name | quote }}
   labels:
     app: strimzi
 data:
