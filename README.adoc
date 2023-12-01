@@ -284,6 +284,62 @@ image::app_camelk_completed.png[]
 
 正常に完了しない際は <<Troubleshooting>> の手順に従い調査します。
 
+== AMQ Streams Operator
+
+基本的な流れは <<Camel K Operator>> と同様ですが、Operator のインストールに加えて以下のタスクを実施します。
+
+* clusters/helper-operator/templates/jobs/kafka.yaml
+  - Kafka Cluster をデプロイする Kafak CR を作成する
+  - Kafaka Exporter でメトリクスを公開する ConfigMap を作成する
+* clusters/helper-operator/templates/jobs/strimzi-pod-monitor.yaml
+  - Prometheus でメトリクスを収集するための PodMonitor CR を作成する
+
+. ApplicationSet CR を作成する
++
+----
+oc apply -f ./applicationsets/amqs/applicationset.yaml
+----
+NOTE: サンプルの tenant-projects/amqs/sample/values.yaml を Main ブランチに配置しているため ApplicationSet CR を作成すると Application CR が生成され、AMQ Streams Operator をインストールする Helm Charts が実行されます。
+そのためこの時点で amqs-test0{,1} Namespace に AMQ Streams Operator がインストールされます。
++
+image::app_amqs_completed.png[]
+
+. Branch を作成する
++
+----
+export BRANCH=my-team
+git branch ${BRANCH}
+git checkout ${BRANCH}
+----
+
+. サンプルから `values.yaml` を作成し必要な値を定義する
++
+----
+cp -r tenant-projects/amqs/sample tenant-projects/amqs/${BRANCH}
+vim tenant-projects/amqs/${BRANCH}/values.yaml
+----
+NOTE: 主に AMQ Streams Operator をインストールする namespace を修正します、設定例は以下のサンプルを参照下さい。
++
+.https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/amqs/sample[tenant-projects/amqs/sample/values.yaml]
+----
+include::tenant-projects/amqs/sample/values.yaml[]
+----
+
+. 変更をコミットし、Remote にプッシュする
++
+----
+git add tenant-projects/${BRANCH}
+git commit tenant-projects/${BRANCH}
+git push -u origin ${BRANCH}
+----
+
+. GitHub で PR を作成し、マージする
++
+NOTE: PR をマージすると Argo CD が差分 (追加した values.yaml) を検出し、values.yaml に定義した Namespace に AMQ Streams Operator をインストールします。
+
+. Argo CD Web Console からアプリケーション (Application CR) の進捗を確認する
++
+
 == Troubleshooting
 
 === Out Of Sync

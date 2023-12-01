@@ -2,7 +2,7 @@ operators:
   amqs-operator0:
     enabled: true
     namespace:
-      name: amqs-test00
+      name: camelk-test00
       create: false
     subscription:
       channel: amq-streams-2.5.x
@@ -37,7 +37,7 @@ operators:
   amqs-operator1:
     enabled: true
     namespace:
-      name: amqs-test01
+      name: camelk-test01
       create: false
     subscription:
       channel: amq-streams-2.5.x
