@@ -6,6 +6,8 @@ kind: Kafka
 metadata:
   name: api-infra
   namespace: {{ $value.namespace.name | quote }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
 spec:
   kafka:
     version: {{ $value.kafka.version | default "3.5.0" | quote }}
@@ -136,6 +138,8 @@ metadata:
   namespace: {{ $value.namespace.name | quote }}
   labels:
     app: strimzi
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
 data:
   kafka-metrics-config.yml: |
     # See https://github.com/prometheus/jmx_exporter for more info about JMX Prometheus Exporter metrics
