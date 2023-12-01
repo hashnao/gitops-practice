@@ -1,6 +1,6 @@
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
-
+{{- if .Values.nexus }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -14,9 +14,6 @@ metadata:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "2" | quote }}
 data:
   settings.xml: |
-{{- end }}
-{{- end }}
-{{- if .Values.nexus }}
     <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
@@ -62,5 +59,6 @@ data:
         </server>
       </servers>
     </settings>
-
+{{- end }}
+{{- end }}
 {{- end }}
