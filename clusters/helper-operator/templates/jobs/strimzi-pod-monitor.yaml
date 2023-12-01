@@ -1,6 +1,6 @@
+{{- With .Values.kafka }}
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
-{{- if $value.kafka }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor

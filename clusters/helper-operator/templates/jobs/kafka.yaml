@@ -1,6 +1,6 @@
+{{- With .Values.kafka }}
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
-{{- if $value.kafka }}
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
@@ -11,8 +11,8 @@ metadata:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
 spec:
   kafka:
-    version: {{ $value.kafka.version | default "3.5.0" | quote }}
-    replicas: {{ $value.kafka.replicas | default "3" | quote }}
+    version: {{ .Values.kafka.version | default "3.5.0" | quote }}
+    replicas: {{ .Values.kafka.replicas | default "3" | quote }}
     listeners:
       - name: plain
         port: 9092
@@ -38,16 +38,16 @@ spec:
       transaction.state.log.min.isr: 2
       default.replication.factor: 3
       min.insync.replicas: 2
-      inter.broker.protocol.version: {{ $value.kafka.protocol_version | default "3.6" | quote }}
+      inter.broker.protocol.version: {{ .Values.kafka.protocol_version | default "3.6" | quote }}
       auto.create.topics.enable: "true"
       log.retention.hours: 24
-      replicas: {{ $value.kafka.log_retention_hours | default "24" | quote }}
+      replicas: {{ .Values.kafka.log_retention_hours | default "24" | quote }}
     storage:
       type: jbod
       volumes:
       - id: 0
         type: persistent-claim
-        size: {{ $value.kafka.storage | default "100Gi" | quote }}
+        size: {{ .Values.kafka.storage | default "100Gi" | quote }}
         deleteClaim: false
     metricsConfig:
       type: jmxPrometheusExporter
@@ -61,11 +61,11 @@ spec:
         - kafka-admin
     resources:
       limits:
-        cpu: {{ $value.kafka.limits.cpu | default "1" | quote }}
-        memory: {{ $value.kafka.limits.memory | default "2Gi" | quote }}
+        cpu: {{ .Values.kafka.limits.cpu | default "1" | quote }}
+        memory: {{ .Values.kafka.limits.memory | default "2Gi" | quote }}
       requests:
-        cpu: {{ $value.kafka.requests.cpu | default "1" | quote }}
-        memory: {{ $value.kafka.requests.memory | default "2Gi" | quote }}
+        cpu: {{ .Values.kafka.requests.cpu | default "1" | quote }}
+        memory: {{ .Values.kafka.requests.memory | default "2Gi" | quote }}
     template:
       pod:
         affinity:
@@ -81,7 +81,7 @@ spec:
                         values:
                           - api-infra-kafka
   zookeeper:
-    replicas: {{ $value.zookeeper.replicas | default "3" | quote }}
+    replicas: {{ .Values.zookeeper.replicas | default "3" | quote }}
     readinessProbe:
       initialDelaySeconds: 15
       timeoutSeconds: 5
@@ -89,7 +89,7 @@ spec:
       initialDelaySeconds: 15
       timeoutSeconds: 5
     storage:
-      size: {{ $value.zookeeper.storage | default "10Gi" | quote }}
+      size: {{ .Values.zookeeper.storage | default "10Gi" | quote }}
       type: persistent-claim
     metricsConfig:
       type: jmxPrometheusExporter
@@ -99,11 +99,11 @@ spec:
           key: zookeeper-metrics-config.yml
     resources:
       limits:
-        cpu: {{ $value.zookeeper.limits.cpu | default "0.5" | quote }}
-        memory: {{ $value.zookeeper.limits.memory | default "1Gi" | quote }}
+        cpu: {{ .Values.zookeeper.limits.cpu | default "0.5" | quote }}
+        memory: {{ .Values.zookeeper.limits.memory | default "1Gi" | quote }}
       requests:
-        cpu: {{ $value.zookeeper.requests.cpu | default "0.5" | quote }}
-        memory: {{ $value.zookeeper.requests.memory | default "1Gi" | quote }}
+        cpu: {{ .Values.zookeeper.requests.cpu | default "0.5" | quote }}
+        memory: {{ .Values.zookeeper.requests.memory | default "1Gi" | quote }}
     template:
       pod:
         affinity:

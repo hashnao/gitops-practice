@@ -1,6 +1,6 @@
+{{- With .Values.nexus }}
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
-{{- if .Values.nexus }}
 ---
 kind: IntegrationPlatform
 apiVersion: camel.apache.org/v1
