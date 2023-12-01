@@ -1,6 +1,6 @@
-{{- if .Values.kafka }}
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
+{{- if .Values.kafka }}
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
