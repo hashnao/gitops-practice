@@ -1,4 +1,4 @@
-{{- range $key, $value := $value.operators }}
+{{- range $key, $value := .Values.operators }}
 {{- if eq ($value.kafka | toString) "true" }}
 ---
 apiVersion: kafka.strimzi.io/v1beta2
