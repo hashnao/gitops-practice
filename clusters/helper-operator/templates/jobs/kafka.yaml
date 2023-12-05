@@ -8,7 +8,7 @@ metadata:
   name: api-infra
   namespace: {{ $value.namespace.name | quote }}
   annotations:
-    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "2" | quote }}
 spec:
   kafka:
     version: {{ $value.kafka.version | default "3.5.0" }}
