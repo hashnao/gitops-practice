@@ -302,8 +302,8 @@ image::app_camelk_completed.png[]
 ----
 oc apply -f ./applicationsets/amqs/applicationset.yaml
 ----
-NOTE: サンプルの tenant-projects/amqs/sample/values.yaml を Main ブランチに配置しているため ApplicationSet CR を作成すると Application CR が生成され、AMQ Streams Operator をインストールする Helm Charts が実行されます。
-そのためこの時点で camelk-test0{,1} Namespace に AMQ Streams Operator がインストールされます。
+NOTE: サンプルの tenant-projects/amqs/sample/values.yaml を Main ブランチに配置しているため ApplicationSet CR を作成すると Application CR が生成され、AMQ Streams Operator をインストールする Helm Charts が実行され、camelk-test0{,1} Namespace に AMQ Streams Operator がインストールされます。
+サンプルで利用する applicationset.yaml の概要は <<ApplicationSet (AMQ Streams Operator)>> を参照下さい。
 以下は検証を目的に camelk-test00 Namespace だけを対象とした実行結果です。
 +
 image::app_amqs_completed.png[]
@@ -543,9 +543,8 @@ i.e. http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/rep
 
 === ApplicationSet (AMQ Streams Operator)
 
-以下は <<AMQ Streams Operator>> のセクションで利用する ApplicationSet CR (applicationsets/amqs/applicationset.yaml) に定義するフィールドで検証で用いた例です。
-主要な差分だけを対象とします。
-Kafak Cluster と Zookeeper の Pod Replica をデフォルトの 3 から 1 に変更する場合、以下のフィールドを定義します。
+以下は <<AMQ Streams Operator>> のセクションで利用する ApplicationSet CR (applicationsets/amqs/applicationset.yaml) に定義するフィールドの設定例です。
+Kafak Cluster と Zookeeper の Pod Replica はデフォルトで 3 であるため、GitOps の動作検証など最小構成で検証する際に Pod Replica を 1 に変更する場合、以下のフィールドを定義します。
 
 ----
 spec:
@@ -559,6 +558,12 @@ spec:
           - name: "operators.amqs-operator0.kafka.min_replicas"
             value: "1"
           - name: "operators.amqs-operator0.zookeeper.replicas"
+            value: "1"
+          - name: "operators.amqs-operator1.kafka.replicas"
+            value: "1"
+          - name: "operators.amqs-operator1.kafka.min_replicas"
+            value: "1"
+          - name: "operators.amqs-operator1.zookeeper.replicas"
             value: "1"
 ----
 
