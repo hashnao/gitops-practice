@@ -1,3 +1,4 @@
+{{- if .Values.nexus }}
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
 ---
@@ -19,5 +20,6 @@ spec:
   kamelet: {}
   resources: {}
   profile: OpenShift
+{{- end }}
 {{- end }}
 {{- end }}

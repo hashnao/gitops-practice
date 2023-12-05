@@ -1,0 +1,18 @@
+{{- range $key, $value := .Values.operators }}
+{{- if eq ($value.enabled | toString) "true" }}
+{{- if $value.kafka  }}
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: kafka-admin
+  namespace: {{ $value.namespace.name | quote }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
+  labels:
+    strimzi.io/cluster: api-infra
+spec:
+  authentication:
+    type: scram-sha-512
+{{- end }}
+{{- end }}
+{{- end }}

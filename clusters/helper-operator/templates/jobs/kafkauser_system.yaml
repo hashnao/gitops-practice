@@ -1,0 +1,34 @@
+{{- range $key, $value := .Values.operators }}
+{{- if eq ($value.enabled | toString) "true" }}
+{{- if $value.kafka  }}
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: {{ $value.kafka.systemuser }}-user
+  namespace: {{ $value.namespace.name | quote }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
+  labels:
+    strimzi.io/cluster: api-infra
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          patternType: prefix
+          name: {{ $value.kafka.systemuser }}-
+        operation: All
+      - resource:
+          type: group
+          patternType: prefix
+          name: {{ $value.kafka.systemuser }}-
+        operation: All
+      - resource:
+          type: cluster
+        operation: IdempotentWrite
+{{- end }}
+{{- end }}
+{{- end }}

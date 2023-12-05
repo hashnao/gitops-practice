@@ -16,6 +16,12 @@ NOTE: 環境に応じて変数を代入するため Helm Charts (values.yaml) �
   - Camel K Operator を指定の Namespace (camelk-test0{0,1}) にインストールする
   - Nexus の認証情報を定義する ConfigMap を作成する
   - IntegrationPlatform CR を作成する
+* <<AMQ Streams Operator>> のセクションで呼び出す Helm Charts (clusters/helper-operator) は 以下のタスクを実施します。
+  - Kafka Cluster をデプロイする Kafak CR と Kafaka Exporter でメトリクスを公開する ConfigMap を作成する https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/kafka.yaml[clusters/helper-operator/templates/jobs/kafka.yaml]
+  - Prometheus でメトリクスを収集するための PodMonitor CR を作成する https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/strimzi-pod-monitor.yaml[clusters/helper-operator/templates/jobs/strimzi-pod-monitor.yaml]
+  - Kafaka Cluster のユーザ (admin) を作成する KafakUser CR を作成する https://github.com/hashnao/gitops-practice/blob/amqs/clusters/helper-operator/templates/jobs/kafkauser_admin.yaml[clusters/helper-operator/templates/jobs/kafkauser_admin.yaml]
+  - Kafaka Cluster のユーザ (system) を作成する KafakUser CR を作成する
+    https://github.com/hashnao/gitops-practice/blob/amqs/clusters/helper-operator/templates/jobs/kafkauser_system.yaml[clusters/helper-operator/templates/jobs/kafkauser_system.yaml]
 
 NOTE: 一つの ApplicationSet CR を作成して <<Namespace & Group>> と <<Camel K Operator>> を一度に実施する想定ではなく、まず <<Namespace & Group>> を実行する ApplicationSet CR を作成して Namespace やグループの作成が完了した後に <<Camel K Operator>> を実行する ApplicationSet CR を作成し、Camel-K Operator をインストールします。
 
@@ -67,6 +73,12 @@ NOTE: https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-opera
 ClusterRoleBinding CR を GitOps で適用すると複数の ApplictionSet を作成すると ClusterRoleBinding CR が複数の Application に共有され https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/#fail-the-sync-if-a-shared-resource-is-found[SharedResourceWarning] が出力され Application のステータスは正常でも OutofSync が起き続けるため、事前に権限を付与することでリソースの競合を回避します。
 
 NOTE: この時点では Camel K Operator をインストールしていないため、該当する Cluster Role も作成されておらず、**Warning: role 'integrationplatforms.camel.apache.org-v1-edit' not found** と出力されますが、そのまま進めます。
+
+* GitOps Operator の Service Account に Kafka CR を edit する権限を付与する
+----
+oc adm policy add-cluster-role-to-user kafkas.kafka.strimzi.io-v1beta2-edit  system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller
+----
+NOTE: IntegrationPlatform CR と同じ背景で https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/kafka.yaml[kafka.yaml] Kafka CR に設定を加えるため、 Cluster Role (kafkas.kafka.strimzi.io-v1beta2-edit) を GitOps Operator の Service Account に付与する必要があります。
 
 * Git Repository をクローンする
 ----
@@ -222,7 +234,6 @@ index 80df157..d7bc022 100644
 +            value: nexus # Nexus Repository Manager のパスワードを指定する
            - name: "nexus.mirror_url"
 -            value: <NEXUS_URL>
--            http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/
 +            value: http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/ # Maven Repository (Nexus Repository Manager) の Kubernetes Service 経由の URL を指定する
        syncPolicy:
          automated:
@@ -283,6 +294,54 @@ Application CR のステータスは <<Troubleshooting>> の手順で示して�
 image::app_camelk_completed.png[]
 
 正常に完了しない際は <<Troubleshooting>> の手順に従い調査します。
+
+== AMQ Streams Operator
+
+. ApplicationSet CR を作成する
++
+----
+oc apply -f ./applicationsets/amqs/applicationset.yaml
+----
+NOTE: サンプルの tenant-projects/amqs/sample/values.yaml を Main ブランチに配置しているため ApplicationSet CR を作成すると Application CR が生成され、AMQ Streams Operator をインストールする Helm Charts が実行され、camelk-test0{,1} Namespace に AMQ Streams Operator がインストールされます。
+サンプルで利用する applicationset.yaml の概要は <<ApplicationSet (AMQ Streams Operator)>> を参照下さい。
+以下は検証を目的に camelk-test00 Namespace だけを対象とした実行結果です。
++
+image::app_amqs_completed.png[]
+
+. Branch を作成する
++
+----
+export BRANCH=my-team
+git branch ${BRANCH}
+git checkout ${BRANCH}
+----
+
+. サンプルから `values.yaml` を作成し必要な値を定義する
++
+----
+cp -r tenant-projects/amqs/sample tenant-projects/amqs/${BRANCH}
+vim tenant-projects/amqs/${BRANCH}/values.yaml
+----
+NOTE: 主に AMQ Streams Operator をインストールする namespace を修正します、設定例は以下のサンプルを参照下さい。
++
+.https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/amqs/sample[tenant-projects/amqs/sample/values.yaml]
+----
+include::tenant-projects/amqs/sample/values.yaml[]
+----
+
+. 変更をコミットし、Remote にプッシュする
++
+----
+git add tenant-projects/${BRANCH}
+git commit tenant-projects/${BRANCH}
+git push -u origin ${BRANCH}
+----
+
+. GitHub で PR を作成し、マージする
++
+NOTE: PR をマージすると Argo CD が差分 (追加した values.yaml) を検出し、values.yaml に定義した Namespace に AMQ Streams Operator をインストールします。
+
+. Argo CD Web Console からアプリケーション (Application CR) の進捗を確認する
 
 == Troubleshooting
 
@@ -458,7 +517,7 @@ spec:
 === ApplicationSet (Camel K Operator)
 
 以下は <<Camel K Operator>> のセクションで利用する ApplicationSet CR (applicationsets/camelk/applicationset.yaml) に定義するフィールドを解説します。
-差分だけを対象とします。
+主要な差分だけを対象とします。
 
 (1) Nexus Repository Manager のユーザ名を指定する
 
@@ -480,6 +539,32 @@ i.e. http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/rep
         automated:
           prune: false
           selfHeal: true
+----
+
+=== ApplicationSet (AMQ Streams Operator)
+
+以下は <<AMQ Streams Operator>> のセクションで利用する ApplicationSet CR (applicationsets/amqs/applicationset.yaml) に定義するフィールドの設定例です。
+Kafak Cluster と Zookeeper の Pod Replica はデフォルトで 3 であるため、GitOps の動作検証など最小構成で検証する際に Pod Replica を 1 に変更する場合、以下のフィールドを定義します。
+
+----
+spec:
+  template:
+    spec:
+      source:
+        helm:
+          parameters:
+          - name: "operators.amqs-operator0.kafka.replicas"
+            value: "1"
+          - name: "operators.amqs-operator0.kafka.min_replicas"
+            value: "1"
+          - name: "operators.amqs-operator0.zookeeper.replicas"
+            value: "1"
+          - name: "operators.amqs-operator1.kafka.replicas"
+            value: "1"
+          - name: "operators.amqs-operator1.kafka.min_replicas"
+            value: "1"
+          - name: "operators.amqs-operator1.zookeeper.replicas"
+            value: "1"
 ----
 
 === Nexus Repository Manager Server Passowrd Encryption

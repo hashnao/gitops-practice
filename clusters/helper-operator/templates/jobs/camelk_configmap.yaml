@@ -1,6 +1,6 @@
+{{- if .Values.nexus }}
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -12,11 +12,10 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "2" | quote }}
+{{- end }}
+{{- end }}
 data:
   settings.xml: |
-{{- end }}
-{{- end }}
-{{- if .Values.nexus }}
     <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
@@ -62,5 +61,4 @@ data:
         </server>
       </servers>
     </settings>
-
 {{- end }}
