@@ -234,7 +234,6 @@ index 80df157..d7bc022 100644
 +            value: nexus # Nexus Repository Manager のパスワードを指定する
            - name: "nexus.mirror_url"
 -            value: <NEXUS_URL>
--            http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/
 +            value: http://nexusrepo-sonatype-nexus-service.dev-tool.svc.cluster.local:8081/repository/maven-public/ # Maven Repository (Nexus Repository Manager) の Kubernetes Service 経由の URL を指定する
        syncPolicy:
          automated:

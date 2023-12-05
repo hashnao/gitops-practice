@@ -12,6 +12,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "2" | quote }}
+{{- end }}
+{{- end }}
 data:
   settings.xml: |
     <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
@@ -59,6 +61,4 @@ data:
         </server>
       </servers>
     </settings>
-{{- end }}
-{{- end }}
 {{- end }}
