@@ -12,7 +12,7 @@ spec:
         files:
           - path: tenant-projects/amqs/*/values.yaml
         repoURL: "https://github.com/hashnao/gitops-practice"
-        revision: amqs
+        revision: main
   template:
     metadata:
       name: "{{ index .path.segments 1 | normalize }}-{{ .path.basename }}"
@@ -25,7 +25,7 @@ spec:
       project: default
       source:
         repoURL: "https://github.com/hashnao/gitops-practice"
-        targetRevision: amqs
+        targetRevision: main
         path: clusters/helper-operator
         helm:
           valueFiles:
