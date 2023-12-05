@@ -514,6 +514,20 @@ spec:
           selfHeal: true (13)
 ----
 
+NOTE: Namespace を作成するには values.yaml に Namespace を定義して Git Repository にプッシュする必要がありますが、Git Repository にプッシュせずに Namespace を作成する場合は ApplicationSet CR に以下の様に指定します。
+----
+spec:
+  template:
+    spec:
+      source:
+        helm:
+         parameters:
+          - name: "namespaces[0].name"
+            value: test00
+          - name: "namespaces[1].name"
+            value: test01
+----
+
 === ApplicationSet (Camel K Operator)
 
 以下は <<Camel K Operator>> のセクションで利用する ApplicationSet CR (applicationsets/camelk/applicationset.yaml) に定義するフィールドを解説します。
