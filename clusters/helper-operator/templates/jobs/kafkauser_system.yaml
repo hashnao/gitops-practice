@@ -6,7 +6,7 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaUser
 metadata:
-  name: {{ $value_user.name }}
+  name: {{ .name }}
   namespace: {{ $value.namespace.name | quote }}
   annotations:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
@@ -21,12 +21,12 @@ spec:
       - resource:
           type: topic
           patternType: prefix
-          name: {{ $value_user.name }}
+          name: {{ .name }}
         operation: All
       - resource:
           type: group
           patternType: prefix
-          name: {{ $value_user.name }}
+          name: {{ .name }}
         operation: All
       - resource:
           type: cluster
