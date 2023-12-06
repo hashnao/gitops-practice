@@ -24,7 +24,9 @@ operators:
       requests:
         cpu: "1"
         memory: 2Gi
-      systemuser: user-information
+      systemusers:
+      - name: user-information-tm-user1
+      - name: user-information-tm-user2
     zookeeper:
       replicas: 3
       storage: 10Gi

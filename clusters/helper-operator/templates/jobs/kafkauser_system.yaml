@@ -1,10 +1,12 @@
 {{- range $key, $value := .Values.operators }}
 {{- if eq ($value.enabled | toString) "true" }}
 {{- if $value.kafka }}
+{{- if $value.kafka.systemusers }}
+{{- range $key_user, $value_user := .kafka.systemusers }}
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaUser
 metadata:
-  name: {{ $value.kafka.systemuser }}
+  name: {{ $value_user.kafka.systemusers }}
   namespace: {{ $value.namespace.name | quote }}
   annotations:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
@@ -19,16 +21,18 @@ spec:
       - resource:
           type: topic
           patternType: prefix
-          name: {{ $value.kafka.systemuser }}
+          name: {{ $value_user.kafka.systemusers }}
         operation: All
       - resource:
           type: group
           patternType: prefix
-          name: {{ $value.kafka.systemuser }}
+          name: {{ $value_user.kafka.systemusers }}
         operation: All
       - resource:
           type: cluster
         operation: IdempotentWrite
+{{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
