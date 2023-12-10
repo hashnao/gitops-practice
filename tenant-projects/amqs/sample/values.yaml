@@ -34,6 +34,22 @@ operators:
       requests:
         cpu: "0.5"
         memory: 1Gi
+    kafkaconnect:
+      name: user-information-connect
+      replicas: "1"
+      replication_factor: "3"
+      limits:
+        cpu: "1"
+        memory: 3Gi
+      requests:
+        cpu: "1"
+        memory: 3Gi
+    kafkaconnector:
+      database:
+        hostname: my-oracle-db.oracledb.svc.cluster.local
+        port: 1521
+        dbname: XEPDB1
+      name: user-information-connect
   amqs-operator1:
     enabled: true
     namespace:
