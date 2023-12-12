@@ -22,6 +22,7 @@ metadata:
   annotations:
     strimzi.io/use-connector-resources: "true"
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "6" | quote }}
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   replicas: {{ $value.kafkaconnect.replicas | default "1" }}
   bootstrapServers: {{ $value.kafkaconnect.name }}-kafka-bootstrap:9092

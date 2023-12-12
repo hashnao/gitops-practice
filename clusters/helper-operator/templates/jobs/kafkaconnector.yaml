@@ -10,6 +10,7 @@ metadata:
   namespace: {{ $value.namespace.name | quote }}
   annotations:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "6" | quote }}
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
     strimzi.io/cluster: {{ $value.kafkaconnect.name | quote }}
 spec:
