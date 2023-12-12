@@ -5,7 +5,7 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  name: api-infra
+  name: {{ $value.kafka.name | quote }}
   namespace: {{ $value.namespace.name | quote }}
   annotations:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}

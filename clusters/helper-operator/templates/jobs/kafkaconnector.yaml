@@ -20,7 +20,7 @@ spec:
     topic.creation.enable: true
     topic.creation.default.replication.factor: 3
     topic.creation.default.partitions: 1
-    database.history.kafka.bootstrap.servers: {{ $value.kafkaconnect.name }}-kafka-bootstrap:9092
+    database.history.kafka.bootstrap.servers: {{ $value.kafka.name }}-kafka-bootstrap:9092
     database.hostname: {{ $value.kafkaconnector.database.hostname }}
     database.port: {{ $value.kafkaconnector.database.port }}
     database.user: CHANGEME

@@ -25,7 +25,7 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   replicas: {{ $value.kafkaconnect.replicas | default "1" }}
-  bootstrapServers: {{ $value.kafkaconnect.name }}-kafka-bootstrap:9092
+  bootstrapServers: {{ $value.kafka.name }}-kafka-bootstrap:9092
   config:
     group.id: {{ $value.kafkaconnect.name }}-group
     offset.storage.topic: {{ $value.kafkaconnect.name }}-offsets

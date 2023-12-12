@@ -22,6 +22,8 @@ NOTE: 環境に応じて変数を代入するため Helm Charts (values.yaml) �
   - Kafaka Cluster のユーザ (admin) を作成する KafakUser CR を作成する https://github.com/hashnao/gitops-practice/blob/amqs/clusters/helper-operator/templates/jobs/kafkauser_admin.yaml[clusters/helper-operator/templates/jobs/kafkauser_admin.yaml]
   - Kafaka Cluster のユーザ (system) を作成する KafakUser CR を作成する
     https://github.com/hashnao/gitops-practice/blob/amqs/clusters/helper-operator/templates/jobs/kafkauser_system.yaml[clusters/helper-operator/templates/jobs/kafkauser_system.yaml]
+  - https://debezium.io/documentation/reference/stable/connectors/oracle.html[Debezium Connector for Oracle] をデプロイするための ImageStream, KafakConnect CR, ConfigMap を作成する https://github.com/hashnao/gitops-practice/blob/amqs/clusters/helper-operator/templates/jobs/kafkaconnect.yaml[clusters/helper-operator/templates/jobs/kafkaconnect.yaml]
+  - Debezium が利用する Kakfa Connector を管理するための Kafakconnector CR を作成する https://github.com/hashnao/gitops-practice/blob/amqs/clusters/helper-operator/templates/jobs/kafkaconnector.yaml[clusters/helper-operator/templates/jobs/kafkaconnector.yaml]
 
 NOTE: 一つの ApplicationSet CR を作成して <<Namespace & Group>> と <<Camel K Operator>> を一度に実施する想定ではなく、まず <<Namespace & Group>> を実行する ApplicationSet CR を作成して Namespace やグループの作成が完了した後に <<Camel K Operator>> を実行する ApplicationSet CR を作成し、Camel-K Operator をインストールします。
 
@@ -74,11 +76,15 @@ ClusterRoleBinding CR を GitOps で適用すると複数の ApplictionSet を�
 
 NOTE: この時点では Camel K Operator をインストールしていないため、該当する Cluster Role も作成されておらず、**Warning: role 'integrationplatforms.camel.apache.org-v1-edit' not found** と出力されますが、そのまま進めます。
 
-* GitOps Operator の Service Account に Kafka CR を edit する権限を付与する
+* GitOps Operator の Service Account に Kafka CR, KafkaUser CR, KafakaConnect CR, KafakaConnector CR を edit する権限を付与する
 ----
 oc adm policy add-cluster-role-to-user kafkas.kafka.strimzi.io-v1beta2-edit  system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller
+oc adm policy add-cluster-role-to-user kafkausers.kafka.strimzi.io-v1beta2-edit system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller
+oc adm policy add-cluster-role-to-user kafkaconnects.kafka.strimzi.io-v1beta2-edit system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller
+oc adm policy add-cluster-role-to-user kafkaconnectors.kafka.strimzi.io-v1beta2-edit system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller
 ----
-NOTE: IntegrationPlatform CR と同じ背景で https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/kafka.yaml[kafka.yaml] Kafka CR に設定を加えるため、 Cluster Role (kafkas.kafka.strimzi.io-v1beta2-edit) を GitOps Operator の Service Account に付与する必要があります。
+NOTE: IntegrationPlatform CR と同じ背景で GitOps Operator の Service Account に https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/kafka.yaml[Kafka CR] に設定を加えるため、Cluster Role (kafkas.kafka.strimzi.io-v1beta2-edit) を付与する必要があります。
+その他に https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/kafkaconnect.yaml[KafkaConnect CR], https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/kafkaconnector.yaml[KafkaConnector CR], https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/kafkauser_admin.yaml[KafkaUser CR] を作成するために関連する Cluster Role を付与します。
 
 * Git Repository をクローンする
 ----
@@ -296,6 +302,20 @@ image::app_camelk_completed.png[]
 正常に完了しない際は <<Troubleshooting>> の手順に従い調査します。
 
 == AMQ Streams Operator
+
+. Secret を作成する
++
+----
+oc -n <NAMESPACE> create secret generic <SECRET_NAME> --from-literal=password=<Debeziumが使用するユーザーのパスワード値>
+----
+NOTE: Debezium がシステム用ユーザーのパスワードを参照できるようにパスワードを定義したシークレットを AMQ Streams Operator をインストールする Namespace に 作成します。
+oc create コマンドで Secret を作成する際に引数に指定する `<SECRET_NAME>` には https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/kafkaconnect.yaml[KafkaConnect CR] の `spec.config.authentication.passwordSecret.secretName` フィールドの `{{ $value.kafkaconnect.name }}` と合致させます。
+デフォルトで https://github.com/hashnao/gitops-practice/blob/main/tenant-projects/amqs/sample/values.yaml[values.yaml] の `operators.amqs-operator0.kafkaconnect フィールドの `name: user-information-connec` と合致させるため、<SECRET_NAME> に user-information-connect を指定します。
++
+.実行例
+----
+oc -n camelk-test00 create secret generic user-information-secret --from-literal=password=debezium
+----
 
 . ApplicationSet CR を作成する
 +
