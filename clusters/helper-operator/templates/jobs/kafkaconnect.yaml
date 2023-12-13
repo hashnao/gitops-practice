@@ -46,7 +46,7 @@ spec:
     volumes:
       - name: connector-config
         secret:
-          secretName: {{ $value.kafkaconnect.name }}
+          secretName: kafkauser-{{ $value.kafka.systemuser }}
   build:
     output:
       type: imagestream

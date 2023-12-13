@@ -317,6 +317,15 @@ oc create コマンドで Secret を作成する際に引数に指定する `<SE
 oc -n camelk-test00 create secret generic user-information-secret --from-literal=password=debezium
 ----
 
+NOTE:
+KafakUser CR を作成するとデフォルトで自動生成されたパスワードを含む Secret が作成されます。
+Secret の命名規則は Prefix に `kafkauser-` がセットされ、その後ろに KafakUser CR の `metadata.name` フィールド (i.e. user-information) が付与されます。
+----
+$ oc get -n camelk-test00 secret kafkauser-user-information 
+NAME                         TYPE     DATA   AGE
+kafkauser-user-information   Opaque   2      20h
+----
+
 . ApplicationSet CR を作成する
 +
 ----
