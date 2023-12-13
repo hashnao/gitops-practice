@@ -40,7 +40,7 @@ spec:
     type: scram-sha-512
     username: {{ $value.kafkaconnect.name }}
     passwordSecret:
-      secretName: {{ $value.kafkaconnect.name }}
+      secretName: kafkauser-{{ $value.kafka.systemuser }}
       password: password
   externalConfiguration:
     volumes:
