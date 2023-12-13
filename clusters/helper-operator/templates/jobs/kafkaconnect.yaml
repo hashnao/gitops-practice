@@ -38,7 +38,7 @@ spec:
     config.providers.directory.class: org.apache.kafka.common.config.provider.DirectoryConfigProvider
   authentication:
     type: scram-sha-512
-    username: {{ $value.kafkaconnect.name }}
+    username: {{ $value.kafka.systemuser }}
     passwordSecret:
       secretName: kafkauser-{{ $value.kafka.systemuser }}
       password: password
