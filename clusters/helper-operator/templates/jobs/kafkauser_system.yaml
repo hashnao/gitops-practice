@@ -31,7 +31,8 @@ spec:
           - All
       - resource:
           type: cluster
-        operations: IdempotentWrite
+        operations:
+          - IdempotentWrite
 {{- end }}
 {{- end }}
 {{- end }}

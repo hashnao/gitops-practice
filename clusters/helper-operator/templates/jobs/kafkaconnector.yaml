@@ -32,7 +32,7 @@ spec:
     key.converter.schemas.enable: false
     value.converter.schemas.enable: false
     table.include.list: API_USER.TM_COMPANY, API_USER.TM_LOCATION, API_USER.TM_ORGANIZATION, API_USER.TM_SUPERVISOR, API_USER.TM_USER, API_USER.TM_USER_EX, API_USER.TM_USER_OUTSIDE, API_USER.TT_USER_UPDATE
-
+    # Additional for user & topic
     database.history.kafka.topic: {{ $value.kafkaconnect.name }}-schema-changes.inventory
     database.history.producer.security.protocol: SASL_PLAINTEXT
     database.history.producer.sasl.mechanism: SCRAM-SHA-512
