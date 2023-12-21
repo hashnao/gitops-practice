@@ -8,6 +8,7 @@ metadata:
   namespace: {{ $value.namespace.name | quote }}
   annotations:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
     strimzi.io/cluster: api-infra
 spec:
@@ -20,15 +21,18 @@ spec:
           type: topic
           patternType: prefix
           name: {{ $value.kafka.systemuser }}
-        operation: All
+        operations:
+          - All
       - resource:
           type: group
           patternType: prefix
           name: {{ $value.kafka.systemuser }}
-        operation: All
+        operations:
+          - All
       - resource:
           type: cluster
-        operation: IdempotentWrite
+        operations:
+          - IdempotentWrite
 {{- end }}
 {{- end }}
 {{- end }}

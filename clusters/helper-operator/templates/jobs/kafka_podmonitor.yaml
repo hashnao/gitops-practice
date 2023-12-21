@@ -11,6 +11,7 @@ metadata:
     app: strimzi
   annotations:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   selector:
     matchLabels:

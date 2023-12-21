@@ -1,0 +1,48 @@
+{{- range $key, $value := .Values.operators }}
+{{- if eq ($value.enabled | toString) "true" }}
+{{- if $value.kafkaconnect }}
+{{- if $value.kafkaconnector }}
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: {{ $value.kafkaconnector.name | quote }}
+  namespace: {{ $value.namespace.name | quote }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "6" | quote }}
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  labels:
+    strimzi.io/cluster: {{ $value.kafkaconnect.name | quote }}
+spec:
+  class: io.debezium.connector.oracle.OracleConnector
+  tasksMax: 1
+  config:
+    topic.creation.enable: true
+    topic.creation.default.replication.factor: 3
+    topic.creation.default.partitions: 1
+    database.history.kafka.bootstrap.servers: {{ $value.kafka.name }}-kafka-bootstrap:9092
+    database.hostname: {{ $value.kafkaconnector.database.hostname }}
+    database.port: {{ $value.kafkaconnector.database.port }}
+    database.user: ${secrets:{{ $value.namespace.name }}/oracle-credentials:username}
+    database.password: ${secrets:{{ $value.namespace.name }}/oracle-credentials:password}
+    database.dbname: {{ $value.kafkaconnector.database.dbname }}
+    database.pdb.name: {{ $value.kafkaconnector.database.dbname }}
+    database.oracle.net.disableOob: true
+    database.server.name: {{ $value.kafkaconnect.name }}-server1
+    key.converter.schemas.enable: false
+    value.converter.schemas.enable: false
+    table.include.list: API_USER.TM_COMPANY, API_USER.TM_LOCATION, API_USER.TM_ORGANIZATION, API_USER.TM_SUPERVISOR, API_USER.TM_USER, API_USER.TM_USER_EX, API_USER.TM_USER_OUTSIDE, API_USER.TT_USER_UPDATE
+    # Additional for user & topic
+    database.history.kafka.topic: {{ $value.kafkaconnect.name }}-schema-changes.inventory
+    database.history.producer.security.protocol: SASL_PLAINTEXT
+    database.history.producer.sasl.mechanism: SCRAM-SHA-512
+    database.history.producer.sasl.jaas.config: |-
+      org.apache.kafka.common.security.scram.ScramLoginModule required username="{{ $value.kafka.systemuser }}" password="${directory:/opt/kafka/external-configuration/connector-config:password}";
+    database.history.consumer.security.protocol: SASL_PLAINTEXT
+    database.history.consumer.sasl.mechanism: SCRAM-SHA-512
+    database.history.consumer.sasl.jaas.config: |-
+      org.apache.kafka.common.security.scram.ScramLoginModule required username="{{ $value.kafka.systemuser }}" password="${directory:/opt/kafka/external-configuration/connector-config:password}";
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

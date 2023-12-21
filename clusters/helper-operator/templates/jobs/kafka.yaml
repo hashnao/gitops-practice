@@ -5,10 +5,11 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  name: api-infra
+  name: {{ $value.kafka.name | quote }}
   namespace: {{ $value.namespace.name | quote }}
   annotations:
-    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "2" | quote }}
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   kafka:
     version: {{ $value.kafka.version | default "3.5.0" }}
@@ -38,7 +39,7 @@ spec:
       transaction.state.log.min.isr: {{ $value.kafka.min_replicas | default "2" }}
       default.replication.factor: {{ $value.kafka.replicas | default "3" }}
       min.insync.replicas: {{ $value.kafka.min_replicas | default "2" }}
-      inter.broker.protocol.version: {{ $value.kafka.protocol_version | default "3.6" }}
+      inter.broker.protocol.version: {{ $value.kafka.protocol_version | default "3.5" }}
       auto.create.topics.enable: "true"
       log.retention.hours: {{ $value.kafka.log_retention_hours | default "24" }}
     storage:
@@ -139,7 +140,7 @@ metadata:
   labels:
     app: strimzi
   annotations:
-    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "3" | quote }}
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "2" | quote }}
 data:
   kafka-metrics-config.yml: |
     # See https://github.com/prometheus/jmx_exporter for more info about JMX Prometheus Exporter metrics
