@@ -307,7 +307,7 @@ image::app_camelk_completed.png[]
 +
 ----
 export NAMESPACE=camelk-test00
-oc -n ${NAMESPACE} create secret generic oracle-secret --from-literal=username=<USERNAME> --from-literal=password=<PASSWORD>
+oc -n ${NAMESPACE} create secret generic oracle-credentials --from-literal=username=<USERNAME> --from-literal=password=<PASSWORD>
 ----
 NOTE: `${NAMESPACE}` に Debezium をデプロイする Namespace を指定します。
 複数の Namespace に Debezium をデプロイする際は Namespace 毎に Secret を作成します。
