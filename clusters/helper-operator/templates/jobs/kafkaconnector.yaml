@@ -23,8 +23,8 @@ spec:
     database.history.kafka.bootstrap.servers: {{ $value.kafka.name }}-kafka-bootstrap:9092
     database.hostname: {{ $value.kafkaconnector.database.hostname }}
     database.port: {{ $value.kafkaconnector.database.port }}
-    database.user: CHANGEME
-    database.password: CHANGEME
+    database.user: ${secrets:{{ $value.namespace.name }}/oracle-credentials:username}
+    database.password: ${secrets:{{ $value.namespace.name }}/oracle-credentials:password}
     database.dbname: {{ $value.kafkaconnector.database.dbname }}
     database.pdb.name: {{ $value.kafkaconnector.database.dbname }}
     database.oracle.net.disableOob: true
