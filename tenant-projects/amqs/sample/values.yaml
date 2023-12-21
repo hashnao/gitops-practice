@@ -37,7 +37,7 @@ operators:
         memory: 1Gi
     kafkaconnect:
       name: user-information-connect
-      replicas: "1"
+      replicas: "3"
       replication_factor: "3"
       limits:
         cpu: "1"
