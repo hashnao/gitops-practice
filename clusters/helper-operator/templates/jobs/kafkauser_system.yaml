@@ -21,15 +21,15 @@ spec:
           type: topic
           patternType: prefix
           name: {{ $value.kafka.systemuser }}
-        operation: All
+        operations: All
       - resource:
           type: group
           patternType: prefix
           name: {{ $value.kafka.systemuser }}
-        operation: All
+        operations: All
       - resource:
           type: cluster
-        operation: IdempotentWrite
+        operations: IdempotentWrite
 {{- end }}
 {{- end }}
 {{- end }}

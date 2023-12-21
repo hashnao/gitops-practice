@@ -39,7 +39,7 @@ spec:
       transaction.state.log.min.isr: {{ $value.kafka.min_replicas | default "2" }}
       default.replication.factor: {{ $value.kafka.replicas | default "3" }}
       min.insync.replicas: {{ $value.kafka.min_replicas | default "2" }}
-      inter.broker.protocol.version: {{ $value.kafka.protocol_version | default "3.6" }}
+      inter.broker.protocol.version: {{ $value.kafka.protocol_version | default "3.5" }}
       auto.create.topics.enable: "true"
       log.retention.hours: {{ $value.kafka.log_retention_hours | default "24" }}
     storage:

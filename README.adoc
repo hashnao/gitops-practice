@@ -303,6 +303,7 @@ image::app_camelk_completed.png[]
 
 == AMQ Streams Operator
 
+//
 . Secret を作成する
 +
 ----
@@ -316,15 +317,7 @@ oc create コマンドで Secret を作成する際に引数に指定する `<SE
 ----
 oc -n camelk-test00 create secret generic user-information-secret --from-literal=password=debezium
 ----
-
-NOTE:
-KafakUser CR を作成するとデフォルトで自動生成されたパスワードを含む Secret が作成されます。
-Secret の命名規則は Prefix に `kafkauser-` がセットされ、その後ろに KafakUser CR の `metadata.name` フィールド (i.e. user-information) が付与されます。
-----
-$ oc get -n camelk-test00 secret kafkauser-user-information 
-NAME                         TYPE     DATA   AGE
-kafkauser-user-information   Opaque   2      20h
-----
+//
 
 . ApplicationSet CR を作成する
 +
@@ -336,6 +329,20 @@ NOTE: サンプルの tenant-projects/amqs/sample/values.yaml を Main ブラン
 以下は検証を目的に camelk-test00 Namespace だけを対象とした実行結果です。
 +
 image::app_amqs_completed.png[]
+NOTE: Kafka Cluster への認証はパスワード認証をベースとした https://access.redhat.com/documentation/en-us/red_hat_amq_streams/2.5/html-single/deploying_and_managing_amq_streams_on_openshift/index#scram_sha_512_authentication[SCRAM-SHA-512 authentication] を利用します。
+KafakUser CR を作成すると以下の Kafaka User とデフォルトで自動生成されたパスワードを含む Secret が作成されます。
+Secret の命名規則は Prefix に `kafkauser-` がセットされ、その後ろに KafakUser CR の `metadata.name` フィールド (i.e. user-information) が付与されます。
+https://github.com/hashnao/gitops-practice/blob/main/clusters/helper-operator/templates/jobs/kafkaconnect.yaml[KafkaConnect CR] は認証にこのユーザ名と Secret 名をデフォルトで利用する様に設定しており、`spec.authentication` フィールドが該当します。
++
+----
+$ oc get -n camelk-test00 secret kafkauser-user-information 
+NAME                         TYPE     DATA   AGE
+kafkauser-user-information   Opaque   2      20h
+$ oc get -n camelk-test00 kafkauser user-information
+NAME               CLUSTER     AUTHENTICATION   AUTHORIZATION   READY
+user-information   api-infra   scram-sha-512    simple          True
+----
+
 
 . Branch を作成する
 +
