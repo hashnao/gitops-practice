@@ -34,8 +34,9 @@ spec:
     config.storage.replication.factor: {{ $value.kafkaconnect.replication_factor | default "3" }}
     offset.storage.replication.factor: {{ $value.kafkaconnect.replication_factor | default "3" }}
     status.storage.replication.factor: {{ $value.kafkaconnect.replication_factor | default "3" }}
-    config.providers: directory
+    config.providers: directory, secrets
     config.providers.directory.class: org.apache.kafka.common.config.provider.DirectoryConfigProvider
+    config.providers.secrets.class: io.strimzi.kafka.KubernetesSecretConfigProvider
   authentication:
     type: scram-sha-512
     username: {{ $value.kafka.systemuser }}

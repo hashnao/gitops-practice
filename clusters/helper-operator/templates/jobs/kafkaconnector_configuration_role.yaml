@@ -1,0 +1,37 @@
+{{- range $key, $value := .Values.operators }}
+{{- if eq ($value.enabled | toString) "true" }}
+{{- if $value.kafkaconnect }}
+{{- if $value.kafkaconnector }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: connector-secret-role
+  namespace: {{ $value.namespace.name | quote }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "5" | quote }}
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["oracle-credentials"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: connector-secret-role-binding
+  namespace: {{ $value.namespace.name | quote }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "5" | quote }}
+subjects:
+- kind: ServiceAccount
+  name: {{ $value.kafkaconnect.name }}-connect
+  namespace: {{ $value.namespace.name | quote }}
+roleRef:
+  kind: Role
+  name: connector-secret-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
