@@ -6,7 +6,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: connector-configuration-role
+  name: connector-secret-role
   namespace: {{ $value.namespace.name | quote }}
   annotations:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "5" | quote }}
@@ -19,7 +19,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: connector-configuration-role-binding
+  name: connector-secret-role-binding
   namespace: {{ $value.namespace.name | quote }}
   annotations:
     argocd.argoproj.io/sync-wave: {{ $value.syncwave | default "5" | quote }}
@@ -29,7 +29,6 @@ subjects:
   namespace: {{ $value.namespace.name | quote }}
 roleRef:
   kind: Role
-  name: connector-configuration-role
   name: {{ $value.kafkaconnect.name }}-connect
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
