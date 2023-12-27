@@ -29,7 +29,7 @@ subjects:
   namespace: {{ $value.namespace.name | quote }}
 roleRef:
   kind: Role
-  name: {{ $value.kafkaconnect.name }}-connect
+  name: connector-secret-role
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
 {{- end }}
